@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.wanderlust.data.DestinationCard
 import com.example.wanderlust.data.SessionManager
 import com.example.wanderlust.data.model.Tour
+import com.example.wanderlust.data.repository.BookingRepository
 import com.example.wanderlust.data.repository.FavoriteRepository
 import com.example.wanderlust.data.repository.TourRepositoryProvider
 import com.example.wanderlust.util.Validation
@@ -18,6 +19,7 @@ import kotlinx.coroutines.withContext
 
 class TourDetailViewModel(
     private val favoriteRepository: FavoriteRepository = FavoriteRepository(),
+    private val bookingRepository: BookingRepository = BookingRepository(),
 ) : ViewModel() {
 
     var isSaved by mutableStateOf(false)
@@ -36,6 +38,10 @@ class TourDetailViewModel(
         private set
     var ratingBusy by mutableStateOf(false)
         private set
+    var bookingBusy by mutableStateOf(false)
+        private set
+    var bookingMessage by mutableStateOf<String?>(null)
+        private set
 
     fun clearSaveMessage() {
         saveMessage = null
@@ -43,6 +49,10 @@ class TourDetailViewModel(
 
     fun clearRateMessage() {
         rateMessage = null
+    }
+
+    fun clearBookingMessage() {
+        bookingMessage = null
     }
 
     fun initRating(destination: DestinationCard) {
@@ -83,6 +93,39 @@ class TourDetailViewModel(
                 }
                 .onFailure { rateMessage = "error" }
             ratingBusy = false
+        }
+    }
+
+    /** Guest: submit request-to-book for this listing. */
+    fun submitBookingRequest(
+        tourId: String,
+        travelDate: String,
+        guests: Int,
+        message: String,
+        guestPhone: String,
+    ) {
+        if (!tourId.matches(Regex("^\\d+$"))) {
+            bookingMessage = "error"
+            return
+        }
+        if (!SessionManager.isLoggedIn()) {
+            bookingMessage = "signin"
+            return
+        }
+        viewModelScope.launch {
+            bookingBusy = true
+            bookingRepository.createRequest(
+                tourId = tourId,
+                travelDate = travelDate.trim().ifBlank { null },
+                guests = guests,
+                message = message.trim(),
+                guestPhone = guestPhone.trim(),
+            ).onSuccess {
+                bookingMessage = "ok"
+            }.onFailure {
+                bookingMessage = it.message?.takeIf { m -> m.isNotBlank() } ?: "error"
+            }
+            bookingBusy = false
         }
     }
 

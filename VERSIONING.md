@@ -26,3 +26,4 @@ Format: **X.Y.Z** (example: `1.4.2`)
 - Repo: `Mao-SokHun/Wanderlust-App`
 - First public line: **1.0.0** (`versionCode` 100)
 - **1.1.0** (`versionCode` 101): production billing — sandbox gated off in prod; Bakong KHQR-only for businesses
+- **1.2.0** (`versionCode` 102): request-to-book, sticky Book CTA, guest My Requests, business inbox, operator photos on detail

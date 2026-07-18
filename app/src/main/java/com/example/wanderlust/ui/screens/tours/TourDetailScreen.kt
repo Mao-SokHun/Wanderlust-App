@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,17 +26,22 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,14 +52,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import com.example.wanderlust.locale.stringApp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.wanderlust.data.DestinationCard
 import com.example.wanderlust.data.GuestAccess
+import com.example.wanderlust.data.SessionManager
 import com.example.wanderlust.data.WanderlustImages
 import com.example.wanderlust.data.GeoLocation
 import com.example.wanderlust.data.destinationsNear
@@ -63,6 +68,7 @@ import com.example.wanderlust.locale.localizedCategory
 import com.example.wanderlust.locale.localizedDescription
 import com.example.wanderlust.locale.localizedLocation
 import com.example.wanderlust.locale.localizedTitle
+import com.example.wanderlust.locale.stringApp
 import com.example.wanderlust.locale.stringLocalized
 import com.example.wanderlust.ui.components.DestinationTitleBlock
 import com.example.wanderlust.ui.components.RegisterToSaveDialog
@@ -107,7 +113,9 @@ private fun TourDetailContent(
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
     var showRegisterToSave by remember { mutableStateOf(false) }
+    var showBookDialog by remember { mutableStateOf(false) }
     val placeLabel = destination.localizedLocation()
+    val bookable = destination.isBookableListing()
 
     fun trySave() {
         if (GuestAccess.requiresAccountToSave()) {
@@ -118,11 +126,36 @@ private fun TourDetailContent(
         }
     }
 
+    fun openBookFlow() {
+        if (!SessionManager.isLoggedIn()) {
+            onSignIn()
+            return
+        }
+        showBookDialog = true
+    }
+
     if (showRegisterToSave) {
         RegisterToSaveDialog(
             onDismiss = { showRegisterToSave = false },
             onRegister = onRegister,
             onSignIn = onSignIn,
+        )
+    }
+
+    if (showBookDialog) {
+        RequestToBookDialog(
+            destination = destination,
+            busy = viewModel.bookingBusy,
+            onDismiss = { showBookDialog = false },
+            onSubmit = { date, guests, phone, message ->
+                viewModel.submitBookingRequest(
+                    tourId = destination.id,
+                    travelDate = date,
+                    guests = guests,
+                    message = message,
+                    guestPhone = phone,
+                )
+            },
         )
     }
 
@@ -133,8 +166,14 @@ private fun TourDetailContent(
             geoForDestination(destination.title, destination.category)
         }
     }
-    val gallery = remember(destination.id) {
-        WanderlustImages.galleryForPlace(destination.id, destination.title, destination.category).take(3)
+    // Prefer operator-uploaded photos; fall back to stock gallery
+    val gallery = remember(destination.id, destination.imageUrl) {
+        val listing = destination.listingImageUrls()
+        if (listing.isNotEmpty()) {
+            listing.take(6)
+        } else {
+            WanderlustImages.galleryForPlace(destination.id, destination.title, destination.category).take(3)
+        }
     }
     val nearby = remember(destination.id, location.latitude, location.longitude) {
         destinationsNear(
@@ -178,6 +217,21 @@ private fun TourDetailContent(
         viewModel.clearRateMessage()
     }
 
+    val bookSent = stringLocalized(R.string.book_request_sent, R.string.book_request_sent_kh)
+    val bookSignIn = stringLocalized(R.string.book_request_signin, R.string.book_request_signin_kh)
+    LaunchedEffect(viewModel.bookingMessage) {
+        val code = viewModel.bookingMessage ?: return@LaunchedEffect
+        val text = when (code) {
+            "ok" -> bookSent
+            "signin" -> bookSignIn
+            "error" -> failedSnackText
+            else -> code
+        }
+        snackbar.showSnackbar(text)
+        if (code == "ok") showBookDialog = false
+        viewModel.clearBookingMessage()
+    }
+
     LaunchedEffect(destination.id) {
         viewModel.loadWeather(location.latitude, location.longitude)
     }
@@ -186,7 +240,8 @@ private fun TourDetailContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = if (bookable) 88.dp else 0.dp),
         ) {
             Box(Modifier.fillMaxWidth().height(220.dp)) {
                 Row(
@@ -228,6 +283,14 @@ private fun TourDetailContent(
                             " ${viewModel.displayRating} (${viewModel.displayRatingCount}) • ${destination.localizedLocation()}",
                             color = Color.White.copy(0.9f),
                             style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                    destination.businessName?.takeIf { it.isNotBlank() }?.let { company ->
+                        Text(
+                            "${stringLocalized(R.string.book_operator_label, R.string.book_operator_label_kh)} $company",
+                            color = Color.White.copy(0.85f),
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.padding(top = 4.dp),
                         )
                     }
                 }
@@ -446,8 +509,129 @@ private fun TourDetailContent(
                 )
             }
         }
-        SnackbarHost(hostState = snackbar, modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp))
+        if (bookable) {
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .navigationBarsPadding(),
+                tonalElevation = 6.dp,
+                shadowElevation = 8.dp,
+            ) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            stringLocalized(R.string.book_from_price, R.string.book_from_price_kh),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            destination.priceLabel.ifBlank { "—" },
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                    Button(onClick = { openBookFlow() }) {
+                        Text(stringLocalized(R.string.book_request_cta, R.string.book_request_cta_kh))
+                    }
+                }
+            }
+        }
+        SnackbarHost(
+            hostState = snackbar,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = if (bookable) 96.dp else 16.dp)
+                .padding(horizontal = 16.dp),
+        )
     }
+}
+
+@Composable
+private fun RequestToBookDialog(
+    destination: DestinationCard,
+    busy: Boolean,
+    onDismiss: () -> Unit,
+    onSubmit: (date: String, guests: Int, phone: String, message: String) -> Unit,
+) {
+    var travelDate by remember { mutableStateOf("") }
+    var guests by remember { mutableIntStateOf(1) }
+    var phone by remember { mutableStateOf(SessionManager.userPhone) }
+    var message by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = { if (!busy) onDismiss() },
+        title = {
+            Text(stringLocalized(R.string.book_request_title, R.string.book_request_title_kh))
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    destination.localizedTitle(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                OutlinedTextField(
+                    value = travelDate,
+                    onValueChange = { travelDate = it },
+                    label = {
+                        Text(stringLocalized(R.string.book_request_date, R.string.book_request_date_kh))
+                    },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = guests.toString(),
+                    onValueChange = { raw ->
+                        guests = raw.filter { it.isDigit() }.toIntOrNull()?.coerceIn(1, 50) ?: 1
+                    },
+                    label = {
+                        Text(stringLocalized(R.string.book_request_guests, R.string.book_request_guests_kh))
+                    },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = { phone = it },
+                    label = {
+                        Text(stringLocalized(R.string.book_request_phone, R.string.book_request_phone_kh))
+                    },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = message,
+                    onValueChange = { message = it.take(1000) },
+                    label = {
+                        Text(stringLocalized(R.string.book_request_message, R.string.book_request_message_kh))
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 2,
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                enabled = !busy,
+                onClick = { onSubmit(travelDate, guests, phone, message) },
+            ) {
+                Text(stringLocalized(R.string.book_request_send, R.string.book_request_send_kh))
+            }
+        },
+        dismissButton = {
+            TextButton(enabled = !busy, onClick = onDismiss) {
+                Text(stringApp(R.string.btn_back))
+            }
+        },
+    )
 }
 
 @Composable

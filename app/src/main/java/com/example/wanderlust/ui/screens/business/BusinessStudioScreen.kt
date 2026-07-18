@@ -60,12 +60,14 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.wanderlust.data.model.BakongCreatePaymentResponse
 import com.example.wanderlust.data.model.BankDeepLink
 import com.example.wanderlust.data.model.BillingPlan
+import com.example.wanderlust.data.model.BookingRequest
 import com.example.wanderlust.data.model.BusinessProfile
 import com.example.wanderlust.data.model.BusinessProfileUpdateRequest
 import com.example.wanderlust.data.model.BusinessTourRequest
 import com.example.wanderlust.data.model.Tour
 import com.example.wanderlust.data.model.routeLabel
 import androidx.compose.runtime.key
+import com.example.wanderlust.data.repository.BookingRepository
 import com.example.wanderlust.data.repository.BusinessRepository
 import com.example.wanderlust.locale.AppLocale
 import com.example.wanderlust.locale.stringApp
@@ -74,6 +76,7 @@ import com.example.wanderlust.ui.components.KhqrPaymentCard
 import com.example.wanderlust.ui.components.SettingsSectionTitle
 import com.example.wanderlust.ui.components.StickyScrollScreen
 import com.example.wanderlust.ui.components.StitchGhostCard
+import com.example.wanderlust.ui.screens.tours.bookingStatusLabel
 import com.example.wanderlust.util.KhqrBitmap
 import com.example.wanderlust.util.Validation
 import kotlinx.coroutines.delay
@@ -118,9 +121,13 @@ fun BusinessStudioScreen(
     onNeedSubscribe: () -> Unit = {},
 ) {
     val repo = remember { BusinessRepository() }
+    val bookingRepo = remember { BookingRepository() }
     val scope = rememberCoroutineScope()
     var profile by remember { mutableStateOf<BusinessProfile?>(null) }
     var myTours by remember { mutableStateOf<List<Tour>>(emptyList()) }
+    var inbox by remember { mutableStateOf<List<BookingRequest>>(emptyList()) }
+    var inboxBusyId by remember { mutableStateOf<String?>(null) }
+    var replyDrafts by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     var showPostForm by remember { mutableStateOf(false) }
@@ -208,8 +215,10 @@ fun BusinessStudioScreen(
             error = null
             val me = repo.getBusinessProfile()
             val tours = repo.getMyTours()
+            val requests = bookingRepo.inbox()
             me.onSuccess { profile = it }.onFailure { error = it.message }
             tours.onSuccess { myTours = it }
+            requests.onSuccess { inbox = it }
             loading = false
         }
     }
@@ -305,6 +314,148 @@ fun BusinessStudioScreen(
                         }
                     }
                 }
+            }
+
+            // Guest booking requests for this business
+            SettingsSectionTitle(
+                stringLocalized(R.string.book_inbox_title, R.string.book_inbox_title_kh) +
+                    if (inbox.isNotEmpty()) " (${inbox.count { it.status == "pending" }})" else "",
+            )
+            if (inbox.isEmpty()) {
+                Text(
+                    stringLocalized(R.string.book_inbox_empty, R.string.book_inbox_empty_kh),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 12.dp),
+                )
+            } else {
+                inbox.forEach { req ->
+                    StitchGhostCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                    ) {
+                        Column(
+                            Modifier.padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            Text(req.tourTitle, fontWeight = FontWeight.SemiBold)
+                            Text(
+                                listOfNotNull(
+                                    req.guestName.takeIf { it.isNotBlank() },
+                                    req.guestEmail.takeIf { it.isNotBlank() },
+                                    req.guestPhone.takeIf { it.isNotBlank() },
+                                ).joinToString(" · "),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                bookingStatusLabel(req.status),
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.labelMedium,
+                            )
+                            val meta = listOfNotNull(
+                                req.travelDate?.takeIf { it.isNotBlank() },
+                                "${req.guests} guests",
+                            ).joinToString(" · ")
+                            if (meta.isNotBlank()) {
+                                Text(meta, style = MaterialTheme.typography.bodySmall)
+                            }
+                            if (req.message.isNotBlank()) {
+                                Text(req.message, style = MaterialTheme.typography.bodySmall)
+                            }
+                            OutlinedTextField(
+                                value = replyDrafts[req.id].orEmpty(),
+                                onValueChange = { text ->
+                                    replyDrafts = replyDrafts + (req.id to text)
+                                },
+                                label = {
+                                    Text(
+                                        stringLocalized(
+                                            R.string.book_inbox_reply,
+                                            R.string.book_inbox_reply_kh,
+                                        ),
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                            )
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                val busy = inboxBusyId == req.id
+                                Button(
+                                    enabled = !busy,
+                                    onClick = {
+                                        scope.launch {
+                                            inboxBusyId = req.id
+                                            bookingRepo.respond(
+                                                req.id,
+                                                "accepted",
+                                                replyDrafts[req.id].orEmpty(),
+                                            ).onSuccess { updated ->
+                                                inbox = inbox.map { if (it.id == updated.id) updated else it }
+                                            }
+                                            inboxBusyId = null
+                                        }
+                                    },
+                                ) {
+                                    Text(
+                                        stringLocalized(
+                                            R.string.book_inbox_accept,
+                                            R.string.book_inbox_accept_kh,
+                                        ),
+                                    )
+                                }
+                                OutlinedButton(
+                                    enabled = !busy,
+                                    onClick = {
+                                        scope.launch {
+                                            inboxBusyId = req.id
+                                            bookingRepo.respond(
+                                                req.id,
+                                                "declined",
+                                                replyDrafts[req.id].orEmpty(),
+                                            ).onSuccess { updated ->
+                                                inbox = inbox.map { if (it.id == updated.id) updated else it }
+                                            }
+                                            inboxBusyId = null
+                                        }
+                                    },
+                                ) {
+                                    Text(
+                                        stringLocalized(
+                                            R.string.book_inbox_decline,
+                                            R.string.book_inbox_decline_kh,
+                                        ),
+                                    )
+                                }
+                                TextButton(
+                                    enabled = !busy,
+                                    onClick = {
+                                        scope.launch {
+                                            inboxBusyId = req.id
+                                            bookingRepo.respond(
+                                                req.id,
+                                                "contacted",
+                                                replyDrafts[req.id].orEmpty(),
+                                            ).onSuccess { updated ->
+                                                inbox = inbox.map { if (it.id == updated.id) updated else it }
+                                            }
+                                            inboxBusyId = null
+                                        }
+                                    },
+                                ) {
+                                    Text(
+                                        stringLocalized(
+                                            R.string.book_inbox_contacted,
+                                            R.string.book_inbox_contacted_kh,
+                                        ),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
             }
 
             SettingsSectionTitle(stringApp(R.string.business_company_settings))

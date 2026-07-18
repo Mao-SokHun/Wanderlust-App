@@ -14,10 +14,13 @@ import com.example.wanderlust.data.model.AdminUser
 import com.example.wanderlust.data.model.AppVersionInfo
 import com.example.wanderlust.data.model.AuthResponse
 import com.example.wanderlust.data.model.BillingPlansResponse
+import com.example.wanderlust.data.model.BookingRequestsResponse
 import com.example.wanderlust.data.model.BusinessProfile
 import com.example.wanderlust.data.model.BusinessProfileUpdateRequest
 import com.example.wanderlust.data.model.BusinessTourRequest
 import com.example.wanderlust.data.model.CancelSubscriptionResponse
+import com.example.wanderlust.data.model.CreateBookingRequestBody
+import com.example.wanderlust.data.model.CreateBookingRequestResponse
 import com.example.wanderlust.data.model.HealthResponse
 import com.example.wanderlust.data.model.FavoriteRequest
 import com.example.wanderlust.data.model.LoginRequest
@@ -44,6 +47,8 @@ import com.example.wanderlust.data.model.SubscriptionStatus
 import com.example.wanderlust.data.model.SupportContactRequest
 import com.example.wanderlust.data.model.AppSupportInfo
 import com.example.wanderlust.data.model.Tour
+import com.example.wanderlust.data.model.UpdateInboxRequestBody
+import com.example.wanderlust.data.model.UpdateInboxResponse
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -204,6 +209,33 @@ interface WanderlustApi {
         @Header("Authorization") token: String,
         @Path("id") id: String,
     ): MessageResponse
+
+    /** Guest: create a booking request for a listing. */
+    @POST("api/bookings/requests")
+    suspend fun createBookingRequest(
+        @Header("Authorization") token: String,
+        @Body request: CreateBookingRequestBody,
+    ): CreateBookingRequestResponse
+
+    /** Guest: list my booking requests. */
+    @GET("api/bookings/mine")
+    suspend fun getMyBookingRequests(
+        @Header("Authorization") token: String,
+    ): BookingRequestsResponse
+
+    /** Business: inbox of guest booking requests. */
+    @GET("api/business/inbox")
+    suspend fun getBusinessInbox(
+        @Header("Authorization") token: String,
+    ): BookingRequestsResponse
+
+    /** Business: accept / decline / contacted. */
+    @PUT("api/business/inbox/{id}")
+    suspend fun updateBusinessInbox(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+        @Body request: UpdateInboxRequestBody,
+    ): UpdateInboxResponse
 
     @GET("api/favorites")
     suspend fun getFavorites(@Header("Authorization") token: String): List<Tour>

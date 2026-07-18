@@ -39,7 +39,7 @@ KH: dict[str, str] = {
     "explore_offline_hint": "កម្មវិធីសាកល្បង USB, emulator, រួច Wi‑Fi ដោយស្វ័យប្រវត្តិ។ ចាប់ផ្តើម backend (npm start)។",
     "explore_sample_tours": "ទេសចរណ៍គំរូ (អូហ្វឡាញ)",
     "profile_tier": "អ្នករុករកមាស",
-    "profile_bookings": "ផែនការរក្សាទុក",
+    "profile_bookings": "សំណើរបស់ខ្ញុំ",
     "profile_help": "មជ្ឈមណ្ឌលជំនួយ",
     "profile_logout": "ចាកចេញ",
     "nearby_you_marker": "អ្នកនៅទីនេះ",

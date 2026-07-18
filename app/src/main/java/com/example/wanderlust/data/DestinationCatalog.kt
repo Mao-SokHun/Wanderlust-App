@@ -33,7 +33,23 @@ data class DestinationCard(
     val packageDetails: TourPackageDetails? = null,
     val tripDetails: TripDetails? = null,
     val rentalDetails: RentalDetails? = null,
-)
+) {
+    /** Numeric API listing id → can receive request-to-book. */
+    fun isBookableListing(): Boolean = id.matches(Regex("^\\d+$")) && !isCustomPlace
+
+    /** Operator photos first, then stock gallery fallback. */
+    fun listingImageUrls(): List<String> {
+        val fromDetails =
+            packageDetails?.imageUrls.orEmpty() +
+                tripDetails?.imageUrls.orEmpty() +
+                rentalDetails?.imageUrls.orEmpty()
+        val primary = imageUrl.takeIf { it.isNotBlank() }
+        return (listOfNotNull(primary) + fromDetails)
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .distinct()
+    }
+}
 
 object DestinationCatalog {
     val categories = CambodiaLabels.categories.map { it.en }
