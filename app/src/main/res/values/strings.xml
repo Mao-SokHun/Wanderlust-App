@@ -272,8 +272,10 @@
     <string name="business_no_tours_kh">អ្នកមិនទាន់បានបង្ហោះទេសចរណ៍។</string>
     <string name="business_plans_title">Subscribe</string>
     <string name="business_plans_title_kh">ជាវ</string>
-    <string name="business_sandbox_hint">Test with Sandbox anytime. KHQR uses bakong-khqr (amount in QR) — open ABA or scan with any bank app.</string>
-    <string name="business_sandbox_hint_kh">សាកល្បង Sandbox បាន។ KHQR ប្រើ bakong-khqr (មានចំនួនលុយក្នុង QR) — បើក ABA ឬស្កេនពី app ធនាគារ។</string>
+    <string name="business_sandbox_hint">Sandbox test pay (dev only). Production uses Bakong KHQR.</string>
+    <string name="business_sandbox_hint_kh">Sandbox សម្រាប់សាកល្បង (dev)។ Production ប្រើ Bakong KHQR។</string>
+    <string name="business_khqr_pay_hint">Pay with Bakong KHQR. After paying, tap verify — admin activates your plan after checking the bank.</string>
+    <string name="business_khqr_pay_hint_kh">បង់តាម Bakong KHQR។ បង់រួចចុចផ្ទៀងផ្ទាត់ — admin នឹងបើក plan បន្ទាប់ពីពិនិត្យធនាគារ។</string>
     <string name="business_pay_sandbox">Pay (Sandbox)</string>
     <string name="business_pay_sandbox_kh">បង់ (Sandbox)</string>
     <string name="business_pay_khqr">Pay with KHQR</string>
@@ -282,8 +284,8 @@
     <string name="business_plan_best_value_kh">តម្លៃល្អបំផុត</string>
     <string name="business_plan_popular">Popular</string>
     <string name="business_plan_popular_kh">ពេញនិយម</string>
-    <string name="business_bakong_soon">Bakong KHQR needs BAKONG_ACCOUNT_ID on the server. Use sandbox until then.</string>
-    <string name="business_bakong_soon_kh">Bakong KHQR ត្រូវការ BAKONG_ACCOUNT_ID លើ server។ ប្រើ sandbox រហូតមាន។</string>
+    <string name="business_bakong_soon">Bakong KHQR is not configured on the server yet. Contact support.</string>
+    <string name="business_bakong_soon_kh">Bakong KHQR មិនទាន់កំណត់លើ server។ សូមទាក់ទង support។</string>
     <string name="business_khqr_scan_hint">Scan with any KHQR bank app, or open ABA below (amount already set).</string>
     <string name="business_khqr_scan_hint_kh">ស្កេនពី app ធនាគារ KHQR ឬបើក ABA ខាងក្រោម (ចំនួនលុយមានស្រាប់)។</string>
     <string name="business_khqr_waiting">After you pay, tap verify. Subscription activates only after payment is confirmed.</string>

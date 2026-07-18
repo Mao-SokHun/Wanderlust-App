@@ -154,18 +154,6 @@ fun ToursMarketplaceScreen(
                     },
                 )
                 FilterChip(
-                    selected = listingType == "VEHICLE",
-                    onClick = { listingType = "VEHICLE" },
-                    label = {
-                        Text(
-                            stringLocalized(
-                                R.string.tours_filter_vehicles,
-                                R.string.tours_filter_vehicles_kh,
-                            ),
-                        )
-                    },
-                )
-                FilterChip(
                     selected = listingType == "TRIP",
                     onClick = { listingType = "TRIP" },
                     label = {

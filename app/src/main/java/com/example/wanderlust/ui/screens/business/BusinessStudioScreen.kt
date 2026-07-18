@@ -979,6 +979,7 @@ fun BusinessSubscribeScreen(
     val scope = rememberCoroutineScope()
     var plans by remember { mutableStateOf<List<BillingPlan>>(emptyList()) }
     var bakongEnabled by remember { mutableStateOf(false) }
+    var sandboxEnabled by remember { mutableStateOf(false) }
     var bakongAutoVerify by remember { mutableStateOf(false) }
     var bakongMessage by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(true) }
@@ -1051,6 +1052,7 @@ fun BusinessSubscribeScreen(
                 usdToKhrRate = res.usdToKhrRate.takeIf { it > 0 } ?: 4100.0
                 val bakong = res.paymentProviders?.bakong
                 bakongEnabled = bakong?.enabled == true
+                sandboxEnabled = res.paymentProviders?.sandbox?.enabled == true
                 bakongAutoVerify = bakong?.autoVerify == true
                 if (bakong?.usdToKhrRate != null && bakong.usdToKhrRate > 0) {
                     usdToKhrRate = bakong.usdToKhrRate
@@ -1096,8 +1098,14 @@ fun BusinessSubscribeScreen(
         title = stringLocalized(R.string.business_plans_title, R.string.business_plans_title_kh),
         onBack = onBack,
     ) {
+        // Payment instructions: Bakong first; sandbox hint only when sandbox is allowed.
         Text(
-            stringLocalized(R.string.business_sandbox_hint, R.string.business_sandbox_hint_kh),
+            bakongMessage
+                ?: if (sandboxEnabled) {
+                    stringLocalized(R.string.business_sandbox_hint, R.string.business_sandbox_hint_kh)
+                } else {
+                    stringLocalized(R.string.business_khqr_pay_hint, R.string.business_khqr_pay_hint_kh)
+                },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -1460,38 +1468,40 @@ fun BusinessSubscribeScreen(
                             }
                             Spacer(Modifier.height(8.dp))
                         }
-                        OutlinedButton(
-                            enabled = payingId == null,
-                            onClick = {
-                                scope.launch {
-                                    payingId = plan.id
-                                    error = null
-                                    repo.sandboxPay(plan.id)
-                                        .onSuccess {
-                                            payingId = null
-                                            finishSuccess(it.message)
-                                        }
-                                        .onFailure {
-                                            error = it.message
-                                            payingId = null
-                                        }
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(46.dp),
-                            shape = RoundedCornerShape(14.dp),
-                        ) {
-                            Text(
-                                if (payingId == plan.id && !bakongEnabled) {
-                                    "…"
-                                } else {
-                                    stringLocalized(
-                                        R.string.business_pay_sandbox,
-                                        R.string.business_pay_sandbox_kh,
-                                    )
+                        if (sandboxEnabled) {
+                            OutlinedButton(
+                                enabled = payingId == null,
+                                onClick = {
+                                    scope.launch {
+                                        payingId = plan.id
+                                        error = null
+                                        repo.sandboxPay(plan.id)
+                                            .onSuccess {
+                                                payingId = null
+                                                finishSuccess(it.message)
+                                            }
+                                            .onFailure {
+                                                error = it.message
+                                                payingId = null
+                                            }
+                                    }
                                 },
-                            )
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(46.dp),
+                                shape = RoundedCornerShape(14.dp),
+                            ) {
+                                Text(
+                                    if (payingId == plan.id && !bakongEnabled) {
+                                        "…"
+                                    } else {
+                                        stringLocalized(
+                                            R.string.business_pay_sandbox,
+                                            R.string.business_pay_sandbox_kh,
+                                        )
+                                    },
+                                )
+                            }
                         }
                     }
                 }
