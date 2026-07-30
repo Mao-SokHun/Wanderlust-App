@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Local dev: USB (127.0.0.1), emulator (10.0.2.2), Wi‑Fi (192.168.x.x) -->
+<!-- Production Network Security Configuration for Wanderlust -->
+<!-- Enforces HTTPS / TLS encrypted connections globally, protecting against Man-In-The-Middle (MITM) attacks on public Wi-Fi -->
 <network-security-config>
-    <base-config cleartextTrafficPermitted="true">
+    <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
         </trust-anchors>
     </base-config>
+    <!-- Allow local dev emulator loopback only -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">localhost</domain>
+    </domain-config>
 </network-security-config>
