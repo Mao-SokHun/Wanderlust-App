@@ -277,26 +277,38 @@ fun TourPackagePostForm(
     val stepErrorText = stepErrorFor(step)
 
     StitchGhostCard(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(
-                stringApp(R.string.pkg_step_label, step + 1, totalSteps),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.SemiBold,
-            )
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            ) {
+                Text(
+                    stringApp(R.string.pkg_step_label, step + 1, totalSteps),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    when (step) {
+                        0 -> stringApp(R.string.pkg_step_basics)
+                        1 -> stringApp(R.string.pkg_step_includes)
+                        2 -> stringApp(R.string.pkg_step_itinerary)
+                        else -> stringApp(R.string.pkg_step_terms)
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
             LinearProgressIndicator(
                 progress = { (step + 1f) / totalSteps },
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Text(
-                when (step) {
-                    0 -> stringApp(R.string.pkg_step_basics)
-                    1 -> stringApp(R.string.pkg_step_includes)
-                    2 -> stringApp(R.string.pkg_step_itinerary)
-                    else -> stringApp(R.string.pkg_step_terms)
-                },
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(999.dp)),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
             )
 
             when (step) {
@@ -308,6 +320,7 @@ fun TourPackagePostForm(
                         placeholder = { Text(stringApp(R.string.hint_tour_title)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
                     )
                     OutlinedTextField(
                         value = description,
@@ -316,6 +329,7 @@ fun TourPackagePostForm(
                         placeholder = { Text(stringApp(R.string.hint_tour_description)) },
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 3,
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
                     )
                     ChipToggleRow(
                         label = stringApp(R.string.pkg_tour_type),
@@ -722,12 +736,18 @@ private fun ChipToggleRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             options.forEach { option ->
+                val isSelected = option in selected
                 FilterChip(
-                    selected = option in selected,
+                    selected = isSelected,
                     onClick = {
                         if (singleSelect) onToggle(option) else onToggle(option)
                     },
                     label = { Text(labels[option] ?: option) },
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ),
                 )
             }
         }

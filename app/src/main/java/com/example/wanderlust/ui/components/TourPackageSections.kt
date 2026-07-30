@@ -25,7 +25,11 @@ import com.example.wanderlust.locale.optionLabel
 import com.example.wanderlust.locale.stringApp
 
 @Composable
-fun TourPackageSections(pkg: TourPackageDetails, priceLabel: String = "") {
+fun TourPackageSections(
+    pkg: TourPackageDetails,
+    priceLabel: String = "",
+    onOpenChat: ((hostName: String, telegram: String?) -> Unit)? = null,
+) {
     val context = LocalContext.current
 
     if (priceLabel.isNotBlank() || pkg.durationLabel().isNotBlank() || pkg.departureDate.isNotBlank()) {
@@ -120,9 +124,20 @@ fun TourPackageSections(pkg: TourPackageDetails, priceLabel: String = "") {
         StitchGhostCard(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
             Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(stringApp(R.string.pkg_detail_contact), fontWeight = FontWeight.SemiBold)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (contact.phone.isNotBlank()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    if (onOpenChat != null) {
                         Button(
+                            onClick = { onOpenChat(pkg.contact.phone.ifBlank { "Host" }, pkg.contact.telegram) },
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(com.example.wanderlust.locale.stringLocalized(R.string.chat_btn_open, R.string.chat_btn_open_kh))
+                        }
+                    }
+                    if (contact.phone.isNotBlank()) {
+                        OutlinedButton(
                             onClick = {
                                 context.startActivity(
                                     Intent(Intent.ACTION_DIAL, Uri.parse("tel:${contact.phone}")),

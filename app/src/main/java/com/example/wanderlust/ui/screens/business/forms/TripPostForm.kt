@@ -226,26 +226,38 @@ fun TripPostForm(
     val stepErrorText = stepErrorFor(step)
 
     StitchGhostCard(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(
-                stringApp(R.string.trip_step_label, step + 1, totalSteps),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.SemiBold,
-            )
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    stringApp(R.string.trip_step_label, step + 1, totalSteps),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    when (step) {
+                        0 -> stringApp(R.string.trip_step_basics)
+                        1 -> stringApp(R.string.trip_step_vehicle)
+                        2 -> stringApp(R.string.trip_step_seats)
+                        else -> stringApp(R.string.trip_step_policies)
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
             LinearProgressIndicator(
                 progress = { (step + 1f) / totalSteps },
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Text(
-                when (step) {
-                    0 -> stringApp(R.string.trip_step_basics)
-                    1 -> stringApp(R.string.trip_step_vehicle)
-                    2 -> stringApp(R.string.trip_step_seats)
-                    else -> stringApp(R.string.trip_step_policies)
-                },
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(999.dp)),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
             )
 
             when (step) {

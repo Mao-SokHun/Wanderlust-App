@@ -25,6 +25,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -107,7 +108,27 @@ private fun TourDetailContent(
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
     var showRegisterToSave by remember { mutableStateOf(false) }
+    var showChat by remember { mutableStateOf(false) }
     val placeLabel = destination.localizedLocation()
+
+    if (showChat) {
+        com.example.wanderlust.ui.screens.chat.DirectChatScreen(
+            hostName = destination.businessName?.ifBlank { null } ?: destination.title,
+            hostTelegram = destination.packageDetails?.contact?.telegram
+                ?: destination.tripDetails?.contact?.telegram
+                ?: destination.rentalDetails?.contact?.telegram,
+            inquiryContext = com.example.wanderlust.data.model.ListingInquiryContext(
+                listingId = destination.id,
+                title = destination.title,
+                priceLabel = destination.priceLabel,
+                imageUrl = gallery.firstOrNull().orEmpty(),
+                category = destination.category,
+                location = destination.location,
+            ),
+            onBack = { showChat = false },
+        )
+        return
+    }
 
     fun trySave() {
         if (GuestAccess.requiresAccountToSave()) {
@@ -252,6 +273,7 @@ private fun TourDetailContent(
                     TourPackageSections(
                         pkg = pkg,
                         priceLabel = destination.priceLabel,
+                        onOpenChat = { _, _ -> showChat = true },
                     )
                 }
                 destination.tripDetails?.let { trip ->
@@ -366,33 +388,53 @@ private fun TourDetailContent(
 
                 Spacer(Modifier.height(16.dp))
                 StitchGhostCard(Modifier.fillMaxWidth()) {
-                    Row(
-                        Modifier.padding(16.dp).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Column {
-                            Text(
-                                stringLocalized(R.string.tour_category_label, R.string.tour_category_label_kh),
-                                style = MaterialTheme.typography.labelSmall,
-                            )
-                            Text(
-                                destination.localizedCategory(),
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Column {
+                                Text(
+                                    stringLocalized(R.string.tour_category_label, R.string.tour_category_label_kh),
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
+                                Text(
+                                    destination.localizedCategory(),
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                            }
+                            Button(onClick = { trySave() }) {
+                                Text(
+                                    if (GuestAccess.requiresAccountToSave()) {
+                                        stringLocalized(
+                                            R.string.guest_save_alert_title,
+                                            R.string.guest_save_alert_title_kh,
+                                        )
+                                    } else {
+                                        stringLocalized(R.string.btn_save_place, R.string.btn_save_place_kh)
+                                    },
+                                )
+                            }
                         }
-                        Button(onClick = { trySave() }) {
+
+                        Button(
+                            onClick = { showChat = true },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            shape = RoundedCornerShape(14.dp),
+                        ) {
+                            Icon(
+                                Icons.Default.Storefront,
+                                contentDescription = null,
+                                modifier = Modifier.padding(end = 8.dp),
+                            )
                             Text(
-                                if (GuestAccess.requiresAccountToSave()) {
-                                    stringLocalized(
-                                        R.string.guest_save_alert_title,
-                                        R.string.guest_save_alert_title_kh,
-                                    )
-                                } else {
-                                    stringLocalized(R.string.btn_save_place, R.string.btn_save_place_kh)
-                                },
+                                stringLocalized(R.string.chat_btn_open, R.string.chat_btn_open_kh),
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             )
                         }
                     }
