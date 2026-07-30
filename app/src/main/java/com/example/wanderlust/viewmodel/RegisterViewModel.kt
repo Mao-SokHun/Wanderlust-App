@@ -21,6 +21,7 @@ data class RegisterUiState(
     val passwordError: String? = null,
     val isEmailDuplicate: Boolean = false,
     val registerSuccess: Boolean = false,
+    val agreedToTerms: Boolean = false,
 )
 
 class RegisterViewModel(
@@ -75,6 +76,10 @@ class RegisterViewModel(
         )
     }
 
+    fun onTermsChange(value: Boolean) {
+        uiState = uiState.copy(agreedToTerms = value, errorMessage = null)
+    }
+
     fun register() {
         val name = uiState.name.trim()
         val email = Validation.normalizeEmail(uiState.email)
@@ -83,6 +88,11 @@ class RegisterViewModel(
         val companyName = uiState.companyName.trim()
         val subtype =
             if (role == "BUSINESS" && uiState.businessSubtype == "TRANSPORT") "TRANSPORT" else "TOURS"
+
+        if (!uiState.agreedToTerms) {
+            uiState = uiState.copy(errorMessage = "You must agree to the Terms of Service & Privacy Policy.")
+            return
+        }
         Validation.validateRegister(
             name = name,
             email = email,

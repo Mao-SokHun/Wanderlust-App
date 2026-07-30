@@ -231,4 +231,5 @@ data class MyTourRatingResponse(
     val tourId: String = "",
     val myRating: Int? = null,
     val comment: String = "",
+    val canReview: Boolean = false,
 )

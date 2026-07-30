@@ -27,8 +27,15 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -50,6 +57,7 @@ fun RegisterScreen(
     viewModel: RegisterViewModel = viewModel(),
 ) {
     val state = viewModel.uiState
+    var showTermsDialog by remember { mutableStateOf(false) }
     val scheme = MaterialTheme.colorScheme
     val fieldShape = RoundedCornerShape(14.dp)
     val fieldColors = OutlinedTextFieldDefaults.colors(
@@ -238,6 +246,25 @@ fun RegisterScreen(
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }
+
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = state.agreedToTerms,
+                            onCheckedChange = { viewModel.onTermsChange(it) }
+                        )
+                        TextButton(onClick = { showTermsDialog = true }) {
+                            Text(
+                                stringLocalized(R.string.terms_agree, R.string.terms_agree_kh),
+                                color = scheme.primary,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+
                     Spacer(Modifier.height(16.dp))
                     Button(
                         onClick = viewModel::register,
@@ -293,6 +320,37 @@ fun RegisterScreen(
                 Text(stringApp(R.string.btn_back))
             }
         }
+    }
+
+    if (showTermsDialog) {
+        AlertDialog(
+            onDismissRequest = { showTermsDialog = false },
+            title = {
+                Text(
+                    text = stringLocalized(R.string.terms_title, R.string.terms_title_kh),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            },
+            text = {
+                val scrollState = rememberScrollState()
+                Column(modifier = Modifier.verticalScroll(scrollState)) {
+                    Text(text = stringLocalized(R.string.terms_text, R.string.terms_text_kh))
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { 
+                    viewModel.onTermsChange(true)
+                    showTermsDialog = false 
+                }) {
+                    Text(stringApp(R.string.btn_ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTermsDialog = false }) {
+                    Text(stringApp(R.string.btn_cancel))
+                }
+            }
+        )
     }
 }
 

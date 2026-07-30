@@ -21,6 +21,18 @@ data class ChatMessage(
         }
 }
 
+data class ChatApiMessage(
+    val id: Int,
+    val sender_id: Int,
+    val receiver_id: Int,
+    val message: String,
+    val created_at: String
+)
+
+data class ChatApiSendRequest(
+    val message: String
+)
+
 /** Quick inquiry preset for 1-tap fast messaging. */
 data class QuickInquiryChip(
     val id: String,

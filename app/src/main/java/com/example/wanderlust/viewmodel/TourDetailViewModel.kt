@@ -36,6 +36,8 @@ class TourDetailViewModel(
         private set
     var ratingBusy by mutableStateOf(false)
         private set
+    var canReview by mutableStateOf(false)
+        private set
 
     fun clearSaveMessage() {
         saveMessage = null
@@ -53,7 +55,10 @@ class TourDetailViewModel(
         if (!SessionManager.isLoggedIn()) return
         viewModelScope.launch {
             TourRepositoryProvider.instance.getMyRating(destination.id)
-                .onSuccess { myRating = it.myRating ?: 0 }
+                .onSuccess { 
+                    myRating = it.myRating ?: 0
+                    canReview = it.canReview
+                }
         }
     }
 

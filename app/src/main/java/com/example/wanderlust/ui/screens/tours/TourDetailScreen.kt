@@ -33,6 +33,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -58,6 +61,10 @@ import com.example.wanderlust.data.GuestAccess
 import com.example.wanderlust.data.WanderlustImages
 import com.example.wanderlust.data.GeoLocation
 import com.example.wanderlust.data.destinationsNear
+import com.example.wanderlust.data.repository.SupportRepository
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import com.example.wanderlust.data.SessionManager
 import com.example.wanderlust.data.formatDistanceKm
 import com.example.wanderlust.data.geoForDestination
 import com.example.wanderlust.locale.localizedCategory
@@ -109,10 +116,16 @@ private fun TourDetailContent(
     val snackbar = remember { SnackbarHostState() }
     var showRegisterToSave by remember { mutableStateOf(false) }
     var showChat by remember { mutableStateOf(false) }
+    var showReportDialog by remember { mutableStateOf(false) }
+    var reportStatus by remember { mutableStateOf<String?>(null) }
+    
+    val supportRepo = remember { SupportRepository() }
+    val scope = rememberCoroutineScope()
     val placeLabel = destination.localizedLocation()
 
     if (showChat) {
         com.example.wanderlust.ui.screens.chat.DirectChatScreen(
+            partnerId = destination.ownerId ?: "",
             hostName = destination.businessName?.ifBlank { null } ?: destination.title,
             hostTelegram = destination.packageDetails?.contact?.telegram
                 ?: destination.tripDetails?.contact?.telegram
@@ -305,7 +318,7 @@ private fun TourDetailContent(
                     }
                 }
                 Spacer(Modifier.height(10.dp))
-                if (destination.id.matches(Regex("^\\d+$"))) {
+                if (destination.id.matches(Regex("^\\d+$")) && viewModel.canReview) {
                     StitchGhostCard(Modifier.fillMaxWidth()) {
                         Column(
                             Modifier.padding(12.dp),
@@ -518,15 +531,62 @@ private fun TourDetailContent(
             IconButton(onClick = onBack) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
             }
-            IconButton(onClick = { trySave() }) {
-                Icon(
-                    if (viewModel.isSaved) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = null,
-                    tint = if (viewModel.isSaved) MaterialTheme.colorScheme.primary else Color.White,
-                )
+            Row {
+                IconButton(onClick = { showReportDialog = true }) {
+                    Icon(
+                        Icons.Default.Flag,
+                        contentDescription = "Report Tour",
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                }
+                IconButton(onClick = { trySave() }) {
+                    Icon(
+                        if (viewModel.isSaved) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = null,
+                        tint = if (viewModel.isSaved) MaterialTheme.colorScheme.primary else Color.White,
+                    )
+                }
             }
         }
         SnackbarHost(hostState = snackbar, modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp))
+    }
+
+    if (showReportDialog) {
+        AlertDialog(
+            onDismissRequest = { showReportDialog = false },
+            title = {
+                Text(stringLocalized(R.string.report_dialog_title, R.string.report_dialog_title_kh))
+            },
+            text = {
+                Text(reportStatus ?: stringLocalized(R.string.report_dialog_text, R.string.report_dialog_text_kh))
+            },
+            confirmButton = {
+                if (reportStatus == null) {
+                    TextButton(onClick = {
+                        reportStatus = "Sending..."
+                        scope.launch {
+                            val msg = "Reporting Tour ID: ${destination.id}, Title: ${destination.title}. From User ID: ${SessionManager.userId}. Reason: Fraud/Scam Tour."
+                            val res = supportRepo.sendMessage("Report Scam Tour", msg)
+                            if (res.isSuccess) {
+                                reportStatus = if (com.example.wanderlust.locale.AppLocale.isKhmer) "បានបញ្ជូនពាក្យបណ្តឹង។ យើងនឹងត្រួតពិនិត្យឆាប់ៗ។" else "Report sent. We will review it soon."
+                            } else {
+                                reportStatus = "Error sending report."
+                            }
+                        }
+                    }) {
+                        Text(stringLocalized(R.string.report_tour, R.string.report_tour_kh))
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { 
+                    showReportDialog = false 
+                    reportStatus = null
+                }) {
+                    Text(if (reportStatus == null) stringApp(R.string.btn_cancel) else stringApp(R.string.btn_ok))
+                }
+            }
+        )
     }
 }
 

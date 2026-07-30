@@ -279,4 +279,17 @@ interface WanderlustApi {
         @Header("Authorization") token: String,
         @Path("id") id: String,
     ): AdminPaymentActionResponse
+
+    @GET("api/chat/{partnerId}")
+    suspend fun getChatHistory(
+        @Header("Authorization") token: String,
+        @Path("partnerId") partnerId: String,
+    ): List<com.example.wanderlust.data.model.ChatApiMessage>
+
+    @POST("api/chat/{partnerId}")
+    suspend fun sendChatMessage(
+        @Header("Authorization") token: String,
+        @Path("partnerId") partnerId: String,
+        @Body request: com.example.wanderlust.data.model.ChatApiSendRequest,
+    ): com.example.wanderlust.data.model.ChatApiMessage
 }

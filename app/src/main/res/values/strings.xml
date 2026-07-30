@@ -1707,4 +1707,27 @@
     <string name="admin_suggested_places_kh">កន្លែងណែនាំ</string>
     <string name="admin_global_users">GLOBAL USERS</string>
     <string name="admin_global_users_kh">អ្នកប្រើសកល</string>
+    <!-- Privacy Policy and Safety Strings -->
+    <string name="terms_agree">I agree to the Terms of Service &amp; Privacy Policy</string>
+    <string name="terms_agree_kh">ខ្ញុំយល់ព្រមតាម លក្ខខណ្ឌ និងគោលការណ៍ឯកជនភាព</string>
+    <string name="terms_error">You must agree to the terms to register.</string>
+    <string name="terms_error_kh">អ្នកត្រូវតែយល់ព្រមដើម្បីចុះឈ្មោះ។</string>
+    <string name="terms_title">Privacy Policy &amp; Terms</string>
+    <string name="terms_title_kh">គោលការណ៍ឯកជនភាព និងលក្ខខណ្ឌ</string>
+    
+    <string name="terms_text">Wanderlust Anti-Scam &amp; Privacy Policy\n\n1. No Scam Tolerance: We do not tolerate any fraudulent listings or scams. Any business found scamming users will be permanently banned without notice.\n\n2. Safety Warning: Do not transfer money outside of the official Wanderlust KHQR system. We are not responsible for funds lost to external transfers.\n\n3. Admin Rights: The App Administrators reserve the right to remove tours, hide reviews, and ban user accounts at their discretion to maintain a safe platform.\n\nBy registering, you agree to these terms.</string>
+    <string name="terms_text_kh">គោលការណ៍ប្រឆាំងការបោកប្រាស់ និងឯកជនភាព\n\n១. យើងមិនអត់ឱនចំពោះការបោកប្រាស់ (Scam) ឡើយ។ ម្ចាស់អាជីវកម្មណាដែលបោកប្រាស់នឹងត្រូវលុបគណនីចោលជាអចិន្ត្រៃយ៍។\n\n២. ការព្រមានសុវត្ថិភាព៖ សូមកុំវេរលុយក្រៅប្រព័ន្ធ Wanderlust KHQR។ យើងមិនទទួលខុសត្រូវចំពោះការបាត់បង់ថវិកាក្រៅប្រព័ន្ធឡើយ។\n\n៣. សិទ្ធិរបស់ Admin៖ Admin មានសិទ្ធិលុបទីតាំង លាក់មតិយោបល់ និងបិទគណនី (Ban) គ្រប់ពេលដើម្បីរក្សាសុវត្ថិភាពផ្លែតហ្វម។\n\nដោយការចុះឈ្មោះ អ្នកយល់ព្រមតាមលក្ខខណ្ឌទាំងនេះ។</string>
+
+    <string name="chat_safety_warning">⚠️ Safety Warning: Do not transfer money outside of Wanderlust KHQR to avoid scams.</string>
+    <string name="chat_safety_warning_kh">⚠️ ព្រមានសុវត្ថិភាព៖ កុំវេរលុយក្រៅប្រព័ន្ធ Wanderlust KHQR ដើម្បីជៀសវាងការចាញ់បោកគេ។</string>
+    <string name="report_user">Report this user</string>
+    <string name="report_user_kh">រាយការណ៍អ្នកប្រើនេះ</string>
+    <string name="report_tour">Report this tour</string>
+    <string name="report_tour_kh">រាយការណ៍ទីតាំងនេះ</string>
+    <string name="report_dialog_title">Report to Admin</string>
+    <string name="report_dialog_title_kh">រាយការណ៍ទៅ Admin</string>
+    <string name="report_dialog_text">Are you sure you want to report this? Our team will review the ticket.</string>
+    <string name="report_dialog_text_kh">តើអ្នកពិតជាចង់រាយការណ៍មែនទេ? ក្រុមការងារយើងនឹងត្រួតពិនិត្យ។</string>
+    <string name="report_success">Report sent. We will review it soon.</string>
+    <string name="report_success_kh">បានបញ្ជូនពាក្យបណ្តឹង។ យើងនឹងត្រួតពិនិត្យឆាប់ៗ។</string>
 </resources>

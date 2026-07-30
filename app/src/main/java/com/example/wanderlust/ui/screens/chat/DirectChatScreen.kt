@@ -42,6 +42,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -61,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.wanderlust.data.SessionManager
+import com.example.wanderlust.data.repository.SupportRepository
 import com.example.wanderlust.data.model.ChatMessage
 import com.example.wanderlust.data.model.ListingInquiryContext
 import com.example.wanderlust.data.model.QuickInquiryPresets
@@ -74,6 +79,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DirectChatScreen(
+    partnerId: String,
     hostName: String,
     hostTelegram: String? = null,
     inquiryContext: ListingInquiryContext? = null,
@@ -82,29 +88,53 @@ fun DirectChatScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
+    val supportRepo = remember { SupportRepository() }
+    val chatRepo = remember { com.example.wanderlust.data.repository.ChatRepository() }
 
     var inputText by remember { mutableStateOf("") }
-    val messages = remember {
-        mutableStateListOf(
-            ChatMessage(
-                senderId = "host",
-                senderName = hostName,
-                senderRole = "BUSINESS",
-                text = if (AppLocale.isKhmer) {
-                    "ជម្រាបសួរ! ខ្ញុំបាទ/នាងខ្ញុំអាចជួយលោកអ្នកអំពីការកក់ ឬសាកសួរព័ត៌មានបន្ថែមបាន។"
-                } else {
-                    "Hello! Thanks for reaching out. How can I help you with your booking today?"
-                },
-                timestamp = System.currentTimeMillis() - 60000,
-                isFromUser = false,
-            ),
-        )
+    var showReportDialog by remember { mutableStateOf(false) }
+    var reportStatus by remember { mutableStateOf<String?>(null) }
+    
+    val messages = remember { mutableStateListOf<ChatMessage>() }
+
+    LaunchedEffect(partnerId) {
+        if (partnerId.isBlank()) return@LaunchedEffect
+        while(true) {
+            chatRepo.getChatHistory(partnerId).onSuccess { apiMessages ->
+                val newMessages = apiMessages.map { apiMsg ->
+                    val isMine = apiMsg.sender_id.toString() == SessionManager.userId
+                    val ts = try {
+                        java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US)
+                            .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+                            .parse(apiMsg.created_at)?.time ?: System.currentTimeMillis()
+                    } catch(e: Exception) { System.currentTimeMillis() }
+                    
+                    ChatMessage(
+                        id = apiMsg.id.toString(),
+                        senderId = apiMsg.sender_id.toString(),
+                        senderName = if (isMine) SessionManager.userName ?: "Traveler" else hostName,
+                        senderRole = if (isMine) "USER" else "BUSINESS",
+                        text = apiMsg.message,
+                        timestamp = ts,
+                        isFromUser = isMine
+                    )
+                }
+                messages.clear()
+                messages.addAll(newMessages)
+                if (messages.isNotEmpty()) {
+                    listState.scrollToItem(messages.size - 1)
+                }
+            }
+            kotlinx.coroutines.delay(3000)
+        }
     }
 
     fun sendMessage(text: String) {
         val trimmed = text.trim()
-        if (trimmed.isBlank()) return
-        val userMsg = ChatMessage(
+        if (trimmed.isBlank() || partnerId.isBlank()) return
+        
+        // Optimistic UI
+        val optimistic = ChatMessage(
             senderId = SessionManager.userId ?: "user",
             senderName = SessionManager.userName ?: "Traveler",
             senderRole = "USER",
@@ -112,11 +142,12 @@ fun DirectChatScreen(
             timestamp = System.currentTimeMillis(),
             isFromUser = true,
         )
-        messages.add(userMsg)
+        messages.add(optimistic)
         inputText = ""
+        scope.launch { listState.animateScrollToItem(messages.size - 1) }
 
         scope.launch {
-            listState.animateScrollToItem(messages.size - 1)
+            chatRepo.sendChatMessage(partnerId, trimmed)
         }
     }
 
@@ -187,6 +218,13 @@ fun DirectChatScreen(
                                     .padding(horizontal = 8.dp, vertical = 4.dp),
                             )
                         }
+                    }
+                    IconButton(onClick = { showReportDialog = true }) {
+                        Icon(
+                            Icons.Default.Flag,
+                            contentDescription = "Report User",
+                            tint = MaterialTheme.colorScheme.error
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -278,6 +316,19 @@ fun DirectChatScreen(
                 .padding(innerPadding)
                 .background(MaterialTheme.colorScheme.background),
         ) {
+            // Warning Banner
+            Surface(
+                color = MaterialTheme.colorScheme.errorContainer,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    stringLocalized(R.string.chat_safety_warning, R.string.chat_safety_warning_kh),
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+
             // Context Banner (if inquiring about a specific listing)
             inquiryContext?.let { ctx ->
                 StitchGhostCard(
@@ -392,5 +443,43 @@ private fun ChatBubble(message: ChatMessage) {
                 modifier = Modifier.padding(top = 2.dp, start = 4.dp, end = 4.dp),
             )
         }
+    }
+
+    if (showReportDialog) {
+        AlertDialog(
+            onDismissRequest = { showReportDialog = false },
+            title = {
+                Text(stringLocalized(R.string.report_dialog_title, R.string.report_dialog_title_kh))
+            },
+            text = {
+                Text(reportStatus ?: stringLocalized(R.string.report_dialog_text, R.string.report_dialog_text_kh))
+            },
+            confirmButton = {
+                if (reportStatus == null) {
+                    TextButton(onClick = {
+                        reportStatus = "Sending..."
+                        scope.launch {
+                            val msg = "Reporting Business: $hostName. From User ID: ${SessionManager.userId}. Reason: Fraud/Scam via Chat."
+                            val res = supportRepo.sendMessage("Report Chat Scam", msg)
+                            if (res.isSuccess) {
+                                reportStatus = if (AppLocale.isKhmer) "បានបញ្ជូនពាក្យបណ្តឹង។ យើងនឹងត្រួតពិនិត្យឆាប់ៗ។" else "Report sent. We will review it soon."
+                            } else {
+                                reportStatus = "Error sending report."
+                            }
+                        }
+                    }) {
+                        Text(stringLocalized(R.string.report_user, R.string.report_user_kh))
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { 
+                    showReportDialog = false 
+                    reportStatus = null
+                }) {
+                    Text(if (reportStatus == null) stringApp(R.string.btn_cancel) else stringApp(R.string.btn_ok))
+                }
+            }
+        )
     }
 }
