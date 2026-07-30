@@ -8,8 +8,7 @@ import com.example.wanderlust.data.model.scheduleLabel
 
 fun Tour.toDestinationCard(): DestinationCard {
     val catalog = DestinationCatalog.findByTitle(title)
-    // Catalog stock photos only when this is a place (no business owner), not a listing
-    if (catalog != null && ownerId.isNullOrBlank()) {
+    if (catalog != null) {
         return catalog.copy(
             id = id,
             description = description.ifBlank { catalog.description },
