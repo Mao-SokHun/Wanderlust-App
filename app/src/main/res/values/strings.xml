@@ -109,6 +109,9 @@
 
     <string name="nearby_loading_places">Loading nearby places…</string>
     <string name="nearby_results_count">%1$d places near you</string>
+    <string name="nearby_no_results">No results found</string>
+    <string name="nearby_no_results_hint">Try different keywords or explore what’s nearby.</string>
+    <string name="nearby_browse_all">Browse All Nearby Places</string>
     <string name="nearby_disabled_settings">Location services are turned off in Settings.</string>
     <string name="nearby_quick_needs">What do you need?</string>
     <string name="nearby_more_categories">More categories</string>
@@ -1178,6 +1181,9 @@
     <string name="nearby_enable_location_kh">បើកទីតាំង</string>
     <string name="nearby_finding_kh">កំពុងរកទីតាំងរបស់អ្នក…</string>
     <string name="nearby_loading_places_kh">កំពុងផ្ទុកកន្លែងជិតខាង…</string>
+    <string name="nearby_no_results_kh">រកមិនឃើញ</string>
+    <string name="nearby_no_results_hint_kh">សូមសាកល្បងពាក្យផ្សេង ឬរុករកនៅតំបន់ជិតខាង។</string>
+    <string name="nearby_browse_all_kh">រុករកកន្លែងទាំងអស់នៅជិត</string>
     <string name="nearby_location_unavailable_kh">មិនអាចអានទីតាំងបច្ចុប្បន្ន។ សាកម្តងទៀតនៅក្រៅ ឬបើក GPS។</string>
     <string name="nearby_moment_emergency_kh">អាសន្ន / មន្ទីរពេទ្យ</string>
     <string name="nearby_moment_evening_food_kh">អាហារពេលល្ងាច</string>

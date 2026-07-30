@@ -16,6 +16,7 @@ data class ChangePasswordUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val successMessage: String? = null,
+    val successDone: Boolean = false,
 )
 
 class ChangePasswordViewModel(
@@ -54,6 +55,7 @@ class ChangePasswordViewModel(
                         copy(
                             isLoading = false,
                             successMessage = response.message,
+                            successDone = true,
                             currentPassword = "",
                             newPassword = "",
                             confirmPassword = "",

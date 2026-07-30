@@ -14,9 +14,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -25,11 +30,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.wanderlust.locale.stringApp
@@ -100,6 +110,8 @@ fun LoginScreen(
 
             StitchGhostCard(modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(18.dp)) {
+                    var showPassword by remember { mutableStateOf(false) }
+
                     OutlinedTextField(
                         value = state.email,
                         onValueChange = viewModel::onEmailChange,
@@ -108,6 +120,8 @@ fun LoginScreen(
                         singleLine = true,
                         shape = fieldShape,
                         colors = fieldColors,
+                        isError = state.emailError != null,
+                        supportingText = state.emailError?.let { { Text(it) } },
                     )
                     Spacer(Modifier.height(12.dp))
                     OutlinedTextField(
@@ -116,9 +130,19 @@ fun LoginScreen(
                         label = { Text(stringApp(R.string.label_password)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        visualTransformation = PasswordVisualTransformation(),
+                        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                         shape = fieldShape,
                         colors = fieldColors,
+                        isError = state.passwordError != null,
+                        supportingText = state.passwordError?.let { { Text(it) } },
+                        trailingIcon = {
+                            IconButton(onClick = { showPassword = !showPassword }) {
+                                Icon(
+                                    imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                    contentDescription = if (showPassword) "Hide password" else "Show password",
+                                )
+                            }
+                        },
                     )
                     if (state.errorMessage != null) {
                         Spacer(Modifier.height(10.dp))

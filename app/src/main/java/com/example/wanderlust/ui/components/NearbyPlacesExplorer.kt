@@ -319,26 +319,76 @@ fun NearbyPlacesExplorer(
                                 )
                                 Spacer(Modifier.height(10.dp))
                             }
-                            Text(
-                                stringApp(R.string.nearby_results_count, state.places.size),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(bottom = 8.dp),
-                            )
-                            state.places.forEach { place ->
-                                NearbyPlaceActionCard(
-                                    place = place,
-                                    isBestPick = place.id == state.bestPickId,
-                                    isSaved = place.id in state.savedPlaceIds,
-                                    isSaving = state.isSaving,
-                                    loadPhoto = { id -> viewModel.loadPlacePhoto(id) },
-                                    onOpenDetails = { openPlaceDetails(place) },
-                                    onDirections = { openDirections(context, place) },
-                                    onCall = place.phoneNumber?.let { number ->
-                                        { openCall(context, number) }
-                                    },
-                                    onSave = { viewModel.savePlace(place) },
+                            // ── Empty Search State ──────────────────────────────────
+                            if (state.places.isEmpty() && state.searchQuery.isNotBlank()) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 32.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Place,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(52.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                    )
+                                    Text(
+                                        stringLocalized(
+                                            R.string.nearby_no_results,
+                                            R.string.nearby_no_results_kh,
+                                        ).ifBlank { "No results found" },
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                    )
+                                    Text(
+                                        "\"${state.searchQuery}\" — " + stringLocalized(
+                                            R.string.nearby_no_results_hint,
+                                            R.string.nearby_no_results_hint_kh,
+                                        ).ifBlank { "Try different keywords or explore what's nearby." },
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                    )
+                                    Spacer(Modifier.height(4.dp))
+                                    OutlinedButton(
+                                        onClick = {
+                                            viewModel.clearSearch()
+                                            viewModel.onCategorySelect(null)
+                                        },
+                                    ) {
+                                        Text(
+                                            stringLocalized(
+                                                R.string.nearby_browse_all,
+                                                R.string.nearby_browse_all_kh,
+                                            ).ifBlank { "Browse All Nearby Places" },
+                                        )
+                                    }
+                                }
+                            } else if (state.places.isNotEmpty()) {
+                                Text(
+                                    stringApp(R.string.nearby_results_count, state.places.size),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(bottom = 8.dp),
                                 )
+                                state.places.forEach { place ->
+                                    NearbyPlaceActionCard(
+                                        place = place,
+                                        isBestPick = place.id == state.bestPickId,
+                                        isSaved = place.id in state.savedPlaceIds,
+                                        isSaving = state.isSaving,
+                                        loadPhoto = { id -> viewModel.loadPlacePhoto(id) },
+                                        onOpenDetails = { openPlaceDetails(place) },
+                                        onDirections = { openDirections(context, place) },
+                                        onCall = place.phoneNumber?.let { number ->
+                                            { openCall(context, number) }
+                                        },
+                                        onSave = { viewModel.savePlace(place) },
+                                    )
+                                }
                             }
                         }
                     }
@@ -713,11 +763,26 @@ private fun NearbyPlacesMap(
             title = stringApp(R.string.nearby_you_marker),
         )
         places.forEach { place ->
+            val pinHue = when {
+                place.primaryType.contains("lodging", ignoreCase = true) ||
+                place.primaryType.contains("hotel", ignoreCase = true) -> com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_BLUE
+                place.primaryType.contains("store", ignoreCase = true) ||
+                place.primaryType.contains("market", ignoreCase = true) ||
+                place.primaryType.contains("shop", ignoreCase = true) -> com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_GREEN
+                place.primaryType.contains("rental", ignoreCase = true) ||
+                place.primaryType.contains("vehicle", ignoreCase = true) ||
+                place.primaryType.contains("car", ignoreCase = true) -> com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_ORANGE
+                place.primaryType.contains("tour", ignoreCase = true) ||
+                place.primaryType.contains("trip", ignoreCase = true) ||
+                place.primaryType.contains("attraction", ignoreCase = true) -> com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_VIOLET
+                else -> com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_RED
+            }
             key(place.id) {
                 Marker(
                     state = rememberMarkerState(position = LatLng(place.latitude, place.longitude)),
                     title = place.name,
                     snippet = place.primaryType.ifBlank { place.address },
+                    icon = com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker(pinHue),
                     onClick = {
                         onPlaceClick(place)
                         true

@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import com.example.wanderlust.ui.components.ProfileAvatar
 import com.example.wanderlust.data.SessionManager
 import com.example.wanderlust.locale.stringLocalized
+import com.example.wanderlust.util.MaskUtils
 import com.example.wanderlust.ui.components.LoginRequiredPanel
 import com.example.wanderlust.ui.components.SettingsSectionTitle
 import com.example.wanderlust.ui.components.StitchGhostCard
@@ -138,7 +139,7 @@ fun ProfileScreen(
                             Text(
                                 listOfNotNull(
                                     city.takeIf { it.isNotBlank() },
-                                    phone.takeIf { it.isNotBlank() },
+                                    phone.takeIf { it.isNotBlank() }?.let { MaskUtils.maskPhone(it) },
                                 ).joinToString(" · "),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,

@@ -30,6 +30,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -224,7 +225,11 @@ fun RegisterScreen(
                         visualTransformation = PasswordVisualTransformation(),
                         shape = fieldShape,
                         colors = fieldColors,
+                        isError = state.passwordError != null,
+                        supportingText = state.passwordError?.let { { Text(it) } }
+                            ?: { Text(stringLocalized(R.string.change_password_hint, R.string.change_password_hint)) },
                     )
+                    PasswordStrengthRow(password = state.password)
                     if (state.errorMessage != null) {
                         Spacer(Modifier.height(10.dp))
                         Text(
@@ -288,5 +293,55 @@ fun RegisterScreen(
                 Text(stringApp(R.string.btn_back))
             }
         }
+    }
+}
+
+/**
+ * Reusable inline password-strength bar: 3 segments, colour-coded Weak/Fair/Medium/Strong.
+ * Mirrors the implementation in ChangePasswordScreen.
+ */
+@Composable
+private fun PasswordStrengthRow(password: String) {
+    if (password.isEmpty()) return
+    val score = when {
+        password.length >= 12 && password.any { it.isDigit() } &&
+            password.any { !it.isLetterOrDigit() } -> 3
+        password.length >= 8 && password.any { it.isDigit() || !it.isLetterOrDigit() } -> 2
+        password.length >= 6 -> 1
+        else -> 0
+    }
+    val label = when (score) {
+        3 -> "Strong / រឹងមាំ"
+        2 -> "Medium / មធ្យម"
+        1 -> "Fair / ទន់ខ្សោយ"
+        else -> "Weak / ខ្សោយ"
+    }
+    val color = when (score) {
+        3 -> MaterialTheme.colorScheme.primary
+        2 -> MaterialTheme.colorScheme.tertiary
+        1 -> MaterialTheme.colorScheme.secondary
+        else -> MaterialTheme.colorScheme.error
+    }
+    Spacer(Modifier.height(8.dp))
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            repeat(3) { index ->
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(
+                            if (index < score) color
+                            else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                        ),
+                )
+            }
+        }
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall,
+            color = color,
+        )
     }
 }

@@ -12,38 +12,89 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Wanderlust — Nature Explorer Theme
+// Primary  : Emerald Green  (trust, nature, Cambodia)
+// Secondary: Warm Amber     (energy, sunshine, star ratings)
+// Tertiary : Sky Blue       (water, sky, travel)
+// ─────────────────────────────────────────────────────────────────────────────
+
 private val DarkScheme = darkColorScheme(
-    primary = WanderlustDark.Primary,
-    onPrimary = WanderlustDark.OnPrimaryContainer,
-    primaryContainer = WanderlustDark.PrimaryContainer,
-    onPrimaryContainer = WanderlustDark.OnPrimaryContainer,
-    tertiary = WanderlustDark.Tertiary,
-    background = WanderlustDark.Background,
-    onBackground = WanderlustDark.OnBackground,
-    surface = WanderlustDark.Surface,
-    onSurface = WanderlustDark.OnSurface,
-    surfaceVariant = WanderlustDark.SurfaceContainerHigh,
-    onSurfaceVariant = WanderlustDark.OnSurfaceVariant,
-    outline = WanderlustDark.Outline,
-    outlineVariant = WanderlustDark.OutlineVariant,
-    error = WanderlustDark.Error,
+    // ── Primary (Emerald) ─────────────────────────────────────────────────────
+    primary                = WanderlustDark.Primary,
+    onPrimary              = WanderlustDark.OnPrimaryContainer,
+    primaryContainer       = WanderlustDark.PrimaryContainer,
+    onPrimaryContainer     = WanderlustDark.OnPrimaryContainer,
+
+    // ── Secondary (Amber) ─────────────────────────────────────────────────────
+    secondary              = WanderlustDark.Secondary,
+    onSecondary            = WanderlustDark.OnSecondaryContainer,
+    secondaryContainer     = WanderlustDark.SecondaryContainer,
+    onSecondaryContainer   = WanderlustDark.OnSecondaryContainer,
+
+    // ── Tertiary (Sky Blue) ───────────────────────────────────────────────────
+    tertiary               = WanderlustDark.Tertiary,
+    onTertiary             = WanderlustDark.OnTertiaryContainer,
+    tertiaryContainer      = WanderlustDark.TertiaryContainer,
+    onTertiaryContainer    = WanderlustDark.OnTertiaryContainer,
+
+    // ── Surface & Background ──────────────────────────────────────────────────
+    background             = WanderlustDark.Background,
+    onBackground           = WanderlustDark.OnBackground,
+    surface                = WanderlustDark.Surface,
+    onSurface              = WanderlustDark.OnSurface,
+    surfaceVariant         = WanderlustDark.SurfaceContainerHigh,
+    onSurfaceVariant       = WanderlustDark.OnSurfaceVariant,
+    surfaceContainer       = WanderlustDark.SurfaceContainer,
+    surfaceContainerHigh   = WanderlustDark.SurfaceContainerHigh,
+    surfaceContainerLow    = WanderlustDark.SurfaceContainerLow,
+
+    // ── Outline ───────────────────────────────────────────────────────────────
+    outline                = WanderlustDark.Outline,
+    outlineVariant         = WanderlustDark.OutlineVariant,
+
+    // ── Error ─────────────────────────────────────────────────────────────────
+    error                  = WanderlustDark.Error,
+    onError                = WanderlustDark.OnError,
 )
 
 private val LightScheme = lightColorScheme(
-    primary = WanderlustLight.Primary,
-    onPrimary = Color.White,
-    primaryContainer = WanderlustLight.PrimaryContainer,
-    onPrimaryContainer = WanderlustLight.OnPrimaryContainer,
-    tertiary = WanderlustLight.Tertiary,
-    background = WanderlustLight.Background,
-    onBackground = WanderlustLight.OnBackground,
-    surface = WanderlustLight.Surface,
-    onSurface = WanderlustLight.OnSurface,
-    surfaceVariant = WanderlustLight.SurfaceContainerHigh,
-    onSurfaceVariant = WanderlustLight.OnSurfaceVariant,
-    outline = WanderlustLight.Outline,
-    outlineVariant = WanderlustLight.OutlineVariant,
-    error = WanderlustLight.Error,
+    // ── Primary (Emerald) ─────────────────────────────────────────────────────
+    primary                = WanderlustLight.Primary,
+    onPrimary              = Color.White,
+    primaryContainer       = WanderlustLight.PrimaryContainer,
+    onPrimaryContainer     = WanderlustLight.OnPrimaryContainer,
+
+    // ── Secondary (Amber) ─────────────────────────────────────────────────────
+    secondary              = WanderlustLight.Secondary,
+    onSecondary            = Color.White,
+    secondaryContainer     = WanderlustLight.SecondaryContainer,
+    onSecondaryContainer   = WanderlustLight.OnSecondaryContainer,
+
+    // ── Tertiary (Sky Blue) ───────────────────────────────────────────────────
+    tertiary               = WanderlustLight.Tertiary,
+    onTertiary             = Color.White,
+    tertiaryContainer      = WanderlustLight.TertiaryContainer,
+    onTertiaryContainer    = WanderlustLight.OnTertiaryContainer,
+
+    // ── Surface & Background ──────────────────────────────────────────────────
+    background             = WanderlustLight.Background,
+    onBackground           = WanderlustLight.OnBackground,
+    surface                = WanderlustLight.Surface,
+    onSurface              = WanderlustLight.OnSurface,
+    surfaceVariant         = WanderlustLight.SurfaceContainerHigh,
+    onSurfaceVariant       = WanderlustLight.OnSurfaceVariant,
+    surfaceContainer       = WanderlustLight.SurfaceContainer,
+    surfaceContainerHigh   = WanderlustLight.SurfaceContainerHigh,
+    surfaceContainerLow    = WanderlustLight.SurfaceContainerLow,
+
+    // ── Outline ───────────────────────────────────────────────────────────────
+    outline                = WanderlustLight.Outline,
+    outlineVariant         = WanderlustLight.OutlineVariant,
+
+    // ── Error ─────────────────────────────────────────────────────────────────
+    error                  = WanderlustLight.Error,
+    onError                = WanderlustLight.OnError,
 )
 
 @Composable

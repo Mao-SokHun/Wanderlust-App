@@ -18,6 +18,7 @@ data class RegisterUiState(
     val companyName: String = "",
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val passwordError: String? = null,
     val isEmailDuplicate: Boolean = false,
     val registerSuccess: Boolean = false,
 )
@@ -49,6 +50,7 @@ class RegisterViewModel(
         uiState = uiState.copy(
             password = value.take(Validation.PASSWORD_MAX),
             errorMessage = null,
+            passwordError = null,
             isEmailDuplicate = false,
         )
     }
@@ -88,7 +90,14 @@ class RegisterViewModel(
             isBusiness = role == "BUSINESS",
             companyName = companyName,
         )?.let {
-            uiState = uiState.copy(errorMessage = it)
+            // Route the error to the right field when possible
+            val isPasswordErr = it.contains("password", ignoreCase = true) ||
+                it.contains("ពាក្យសម្ងាត់", ignoreCase = true)
+            uiState = if (isPasswordErr) {
+                uiState.copy(passwordError = it)
+            } else {
+                uiState.copy(errorMessage = it)
+            }
             return
         }
         viewModelScope.launch {
