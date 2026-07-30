@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ConfirmationNumber
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -148,12 +149,36 @@ fun TicketQrDialog(
             }
         },
         confirmButton = {
-            Button(
-                onClick = onDismiss,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-            ) {
-                Text("Close / បិទ")
+            Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = {
+                        val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(
+                                android.content.Intent.EXTRA_TEXT,
+                                "🎟️ Wanderlust Ticket: ${ticket.title}\nRef: ${ticket.bookingRef}\nTravel Date: ${ticket.travelDate} (${ticket.departureTime})\nSeat: ${ticket.seatNumber}\nPassenger: ${ticket.passengerName}\nTotal: ${CurrencyUtils.formatDualPrice(ticket.priceUsd)}",
+                            )
+                        }
+                        context.startActivity(android.content.Intent.createChooser(shareIntent, "Save / Share Ticket"))
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Icon(
+                        Icons.Default.Download,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp).padding(end = 6.dp),
+                    )
+                    Text(if (AppLocale.isKhmer) "ទាញយក / ចែករំលែកសំបុត្រ" else "Download / Share Ticket")
+                }
+
+                OutlinedButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Text("Close / បិទ")
+                }
             }
         },
     )

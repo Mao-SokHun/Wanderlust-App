@@ -363,6 +363,14 @@ private fun TourDetailContent(
                 )
                 Spacer(Modifier.height(12.dp))
 
+                com.example.wanderlust.ui.components.WeatherForecastSection(
+                    initialCity = destination.location.ifBlank { "Siem Reap" },
+                )
+                Spacer(Modifier.height(12.dp))
+
+                com.example.wanderlust.ui.components.AudioGuidePlayer()
+                Spacer(Modifier.height(12.dp))
+
                 StitchGhostCard(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(stringApp(R.string.map_location), fontWeight = FontWeight.SemiBold)
