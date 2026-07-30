@@ -54,6 +54,13 @@ fun TripDetailSections(trip: TripDetails, priceLabel: String = "") {
         }
     }
 
+    // Interactive Bus Route Polyline Map
+    TripRouteMap(
+        departureCity = trip.departureCity.ifBlank { "Phnom Penh" },
+        arrivalCity = trip.arrivalCity.ifBlank { "Siem Reap" },
+        modifier = Modifier.padding(bottom = 12.dp),
+    )
+
     if (trip.amenities.isNotEmpty()) {
         StitchGhostCard(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
             Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
