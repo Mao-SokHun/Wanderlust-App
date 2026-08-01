@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    // To enable FCM: add google-services.json to app/ dir, then uncomment:
+    // id("com.google.gms.google-services")
 }
 
 val localProperties = Properties().apply {
@@ -39,8 +41,8 @@ android {
         // Bump BOTH when shipping an update (see backend/APP_UPDATE.md).
         // SemVer versionName (X.Y.Z). versionCode must always increase for Android upgrades.
         // Start at 100 so sideload upgrades from the old Mao-SokHun/Wanderlust APKs still work.
-        versionCode = 101
-        versionName = "1.1.0"
+        versionCode = 102
+        versionName = "1.2.0"
         ndk {
             // Phone ABIs only — smaller APK, fewer install failures after Play Protect.
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
@@ -141,4 +143,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     debugImplementation("androidx.compose.ui:ui-tooling")
+    // Firebase Cloud Messaging
+    // NOTE: To activate, add google-services.json from Firebase Console to app/ folder
+    // and apply plugin: id("com.google.gms.google-services") in this file
+    // implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    // implementation("com.google.firebase:firebase-messaging-ktx")
 }

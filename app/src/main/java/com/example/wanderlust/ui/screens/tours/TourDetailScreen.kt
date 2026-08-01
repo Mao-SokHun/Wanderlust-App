@@ -118,6 +118,8 @@ private fun TourDetailContent(
     var showChat by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
     var reportStatus by remember { mutableStateOf<String?>(null) }
+    var translatedText by remember { mutableStateOf<String?>(null) }
+    var isTranslating by remember { mutableStateOf(false) }
     
     val supportRepo = remember { SupportRepository() }
     val scope = rememberCoroutineScope()
@@ -268,18 +270,53 @@ private fun TourDetailContent(
             }
 
             Column(Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringLocalized(R.string.tour_experience_title, R.string.tour_experience_title_kh),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    TextButton(
+                        onClick = {
+                            if (translatedText != null) {
+                                translatedText = null
+                            } else {
+                                isTranslating = true
+                                scope.launch {
+                                    val rawDesc = destination.localizedDescription().ifEmpty {
+                                        stringLocalized(R.string.tour_default_desc, R.string.tour_default_desc_kh)
+                                    }
+                                    val result = com.example.wanderlust.util.TranslationHelper.translate(
+                                        rawDesc,
+                                        targetLang = if (AppLocale.isKhmer) "en" else "km"
+                                    )
+                                    translatedText = result
+                                    isTranslating = false
+                                }
+                            }
+                        }
+                    ) {
+                        Text(
+                            when {
+                                isTranslating -> if (AppLocale.isKhmer) "កំពុងបកប្រែ..." else "Translating..."
+                                translatedText != null -> if (AppLocale.isKhmer) "បង្ហាញដើម" else "Show Original"
+                                else -> if (AppLocale.isKhmer) "បកប្រែជាអង់គ្លេស" else "Translate"
+                            },
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                }
                 Text(
-                    stringLocalized(R.string.tour_experience_title, R.string.tour_experience_title_kh),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    destination.localizedDescription().ifEmpty {
+                    translatedText ?: destination.localizedDescription().ifEmpty {
                         stringLocalized(R.string.tour_default_desc, R.string.tour_default_desc_kh)
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
+                    modifier = Modifier.padding(top = 4.dp, bottom = 16.dp),
                 )
 
                 destination.packageDetails?.let { pkg ->

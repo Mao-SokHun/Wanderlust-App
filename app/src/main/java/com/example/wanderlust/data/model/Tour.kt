@@ -233,3 +233,15 @@ data class MyTourRatingResponse(
     val comment: String = "",
     val canReview: Boolean = false,
 )
+
+data class TranslateRequest(
+    val text: String,
+    val targetLang: String = "en",
+)
+
+data class TranslateResponse(
+    val originalText: String = "",
+    val translatedText: String = "",
+    val targetLang: String = "en",
+    val isAutoTranslated: Boolean = true,
+)

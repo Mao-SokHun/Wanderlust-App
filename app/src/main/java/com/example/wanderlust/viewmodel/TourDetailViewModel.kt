@@ -51,6 +51,7 @@ class TourDetailViewModel(
         displayRating = destination.rating
         displayRatingCount = destination.ratingCount
         myRating = 0
+        canReview = false  // reset on every new tour load to prevent stale state
         if (!destination.id.matches(Regex("^\\d+$"))) return
         if (!SessionManager.isLoggedIn()) return
         viewModelScope.launch {

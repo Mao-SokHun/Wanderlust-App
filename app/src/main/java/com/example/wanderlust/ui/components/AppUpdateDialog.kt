@@ -11,6 +11,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.unit.dp
 import com.example.wanderlust.R
 import com.example.wanderlust.data.repository.AppUpdateAvailability
 import com.example.wanderlust.locale.stringApp
@@ -47,28 +50,39 @@ fun AppUpdateDialog(
             )
         },
         confirmButton = {
-            TextButton(
-                enabled = !busy,
-                onClick = {
-                    scope.launch {
-                        busy = true
-                        status = downloadingLabel
-                        val err = ApkInstaller.downloadAndInstall(context, update.downloadUrl)
-                        busy = false
-                        if (err != null) {
-                            status = err
-                        } else if (!update.forceUpdate) {
-                            onDismiss()
-                        } else {
-                            status = null
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (status != null && update.info.downloadPageUrl.isNotBlank()) {
+                    TextButton(
+                        onClick = {
+                            ApkInstaller.openDownloadPage(context, update.info.downloadPageUrl)
                         }
+                    ) {
+                        Text(if (com.example.wanderlust.locale.AppLocale.isKhmer) "ទាញយកតាម Chrome" else "Open in Browser")
                     }
-                },
-            ) {
-                Text(
-                    if (busy) downloadingLabel else stringApp(R.string.update_download),
-                    fontWeight = FontWeight.Bold,
-                )
+                }
+                TextButton(
+                    enabled = !busy,
+                    onClick = {
+                        scope.launch {
+                            busy = true
+                            status = downloadingLabel
+                            val err = ApkInstaller.downloadAndInstall(context, update.downloadUrl)
+                            busy = false
+                            if (err != null) {
+                                status = err
+                            } else if (!update.forceUpdate) {
+                                onDismiss()
+                            } else {
+                                status = null
+                            }
+                        }
+                    },
+                ) {
+                    Text(
+                        if (busy) downloadingLabel else stringApp(R.string.update_download),
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
         },
         dismissButton = {

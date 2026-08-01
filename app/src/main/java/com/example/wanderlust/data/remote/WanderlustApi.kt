@@ -44,6 +44,8 @@ import com.example.wanderlust.data.model.SubscriptionStatus
 import com.example.wanderlust.data.model.SupportContactRequest
 import com.example.wanderlust.data.model.AppSupportInfo
 import com.example.wanderlust.data.model.Tour
+import com.example.wanderlust.data.model.ChatApiMessage
+import com.example.wanderlust.data.model.ChatApiSendRequest
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -284,12 +286,17 @@ interface WanderlustApi {
     suspend fun getChatHistory(
         @Header("Authorization") token: String,
         @Path("partnerId") partnerId: String,
-    ): List<com.example.wanderlust.data.model.ChatApiMessage>
+    ): List<ChatApiMessage>
 
     @POST("api/chat/{partnerId}")
     suspend fun sendChatMessage(
         @Header("Authorization") token: String,
         @Path("partnerId") partnerId: String,
-        @Body request: com.example.wanderlust.data.model.ChatApiSendRequest,
-    ): com.example.wanderlust.data.model.ChatApiMessage
+        @Body request: ChatApiSendRequest,
+    ): ChatApiMessage
+
+    @POST("api/translate")
+    suspend fun translateText(
+        @Body request: com.example.wanderlust.data.model.TranslateRequest,
+    ): com.example.wanderlust.data.model.TranslateResponse
 }

@@ -13,6 +13,7 @@ import com.example.wanderlust.data.remote.ApiConnection
 import com.example.wanderlust.data.repository.AuthRepository
 import com.example.wanderlust.util.SocialAuthHelper
 import com.facebook.FacebookSdk
+import com.example.wanderlust.messaging.NotificationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -42,6 +43,8 @@ class WanderlustApp : Application(), ImageLoaderFactory {
                 runCatching { AuthRepository().fetchProfile() }
             }
         }
+        // Create notification channels (required for Android 8+)
+        NotificationHelper.createChannels(this)
     }
 
     override fun newImageLoader(): ImageLoader =

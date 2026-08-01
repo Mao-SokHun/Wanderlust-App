@@ -45,7 +45,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.filled.Flag
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -74,6 +73,7 @@ import com.example.wanderlust.locale.stringApp
 import com.example.wanderlust.locale.stringLocalized
 import com.example.wanderlust.ui.components.ProfileAvatar
 import com.example.wanderlust.ui.components.StitchGhostCard
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -99,33 +99,35 @@ fun DirectChatScreen(
 
     LaunchedEffect(partnerId) {
         if (partnerId.isBlank()) return@LaunchedEffect
-        while(true) {
-            chatRepo.getChatHistory(partnerId).onSuccess { apiMessages ->
-                val newMessages = apiMessages.map { apiMsg ->
-                    val isMine = apiMsg.sender_id.toString() == SessionManager.userId
-                    val ts = try {
-                        java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US)
-                            .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
-                            .parse(apiMsg.created_at)?.time ?: System.currentTimeMillis()
-                    } catch(e: Exception) { System.currentTimeMillis() }
-                    
-                    ChatMessage(
-                        id = apiMsg.id.toString(),
-                        senderId = apiMsg.sender_id.toString(),
-                        senderName = if (isMine) SessionManager.userName ?: "Traveler" else hostName,
-                        senderRole = if (isMine) "USER" else "BUSINESS",
-                        text = apiMsg.message,
-                        timestamp = ts,
-                        isFromUser = isMine
-                    )
+        while (true) {
+            try {
+                chatRepo.getChatHistory(partnerId).onSuccess { apiMessages ->
+                    val newMessages = apiMessages.map { apiMsg ->
+                        val isMine = apiMsg.sender_id.toString() == SessionManager.userId
+                        val ts = try {
+                            java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US)
+                                .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+                                .parse(apiMsg.created_at)?.time ?: System.currentTimeMillis()
+                        } catch (e: Exception) { System.currentTimeMillis() }
+
+                        ChatMessage(
+                            id = apiMsg.id.toString(),
+                            senderId = apiMsg.sender_id.toString(),
+                            senderName = if (isMine) SessionManager.userName ?: "Traveler" else hostName,
+                            senderRole = if (isMine) "USER" else "BUSINESS",
+                            text = apiMsg.message,
+                            timestamp = ts,
+                            isFromUser = isMine
+                        )
+                    }
+                    messages.clear()
+                    messages.addAll(newMessages)
+                    if (messages.isNotEmpty()) {
+                        listState.scrollToItem(messages.size - 1)
+                    }
                 }
-                messages.clear()
-                messages.addAll(newMessages)
-                if (messages.isNotEmpty()) {
-                    listState.scrollToItem(messages.size - 1)
-                }
-            }
-            kotlinx.coroutines.delay(3000)
+            } catch (_: Exception) { /* network failure — retry next cycle */ }
+            delay(3000)
         }
     }
 
