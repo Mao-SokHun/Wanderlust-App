@@ -108,16 +108,16 @@ fun KhqrPaymentCard(
             )
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(36.dp)
                     .clip(CircleShape)
                     .background(Color.White)
-                    .padding(4.dp),
+                    .padding(2.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Image(
                     painter = painterResource(R.drawable.ic_khqr_mark),
                     contentDescription = null,
-                    modifier = Modifier.size(40.dp),
+                    modifier = Modifier.size(30.dp),
                 )
             }
         }

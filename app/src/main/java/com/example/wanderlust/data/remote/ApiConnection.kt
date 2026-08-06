@@ -33,9 +33,9 @@ object ApiConnection {
     private var activeBaseUrl: String? = null
 
     private val httpClient = OkHttpClient.Builder()
-        .connectTimeout(8, TimeUnit.SECONDS)
-        .readTimeout(8, TimeUnit.SECONDS)
-        .callTimeout(10, TimeUnit.SECONDS)
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .callTimeout(35, TimeUnit.SECONDS)
         .retryOnConnectionFailure(true)
         .build()
 
@@ -103,7 +103,7 @@ object ApiConnection {
     }
 
     private suspend fun probeUrl(baseUrl: String): Boolean = try {
-        val timeout = if (baseUrl.startsWith("https://")) 8_000L else PROBE_TIMEOUT_MS
+        val timeout = if (baseUrl.startsWith("https://")) 30_000L else PROBE_TIMEOUT_MS
         withTimeoutOrNull(timeout) {
             buildApi(baseUrl).health()
             true
@@ -124,7 +124,7 @@ object ApiConnection {
         }
         try {
             // Allow Render cold start to finish while local probes fail quickly.
-            withTimeoutOrNull(10_000L) {
+            withTimeoutOrNull(30_000L) {
                 done.await()
             }
         } finally {
