@@ -295,10 +295,10 @@
     <string name="business_plan_best_value_kh">តម្លៃល្អបំផុត</string>
     <string name="business_plan_popular">Popular</string>
     <string name="business_plan_popular_kh">ពេញនិយម</string>
-    <string name="business_bakong_soon">Bakong KHQR is not configured on the server yet. Contact support.</string>
-    <string name="business_bakong_soon_kh">Bakong KHQR មិនទាន់កំណត់លើ server។ សូមទាក់ទង support។</string>
-    <string name="business_khqr_scan_hint">Scan with any KHQR bank app, or open ABA below (amount already set).</string>
-    <string name="business_khqr_scan_hint_kh">ស្កេនពី app ធនាគារ KHQR ឬបើក ABA ខាងក្រោម (ចំនួនលុយមានស្រាប់)។</string>
+    <string name="business_bakong_soon">Bakong KHQR is not configured on the server yet. Contact support.</string> <!-- P0: This string is not used in the latest code. -->
+    <string name="business_bakong_soon_kh">Bakong KHQR មិនទាន់កំណត់លើ server។ សូមទាក់ទង support។</string> <!-- P0: This string is not used in the latest code. -->
+    <string name="business_khqr_scan_hint">Scan with any KHQR bank app. ⚠️ Safety: Only pay through this official QR. Do not transfer to personal accounts.</string>
+    <string name="business_khqr_scan_hint_kh">ស្កេនពី app ធនាគារ KHQR។ ⚠️ សុវត្ថិភាព៖ បង់តែតាម QR ផ្លូវការនេះ។ កុំវេរលុយទៅគណនីបុគ្គល។</string>
     <string name="business_khqr_waiting">After you pay, tap verify. Subscription activates only after payment is confirmed.</string>
     <string name="business_khqr_waiting_kh">បង់រួច ចុចផ្ទៀងផ្ទាត់។ Subscription បើកបានតែពេលផ្ទៀងផ្ទាត់ការបង់ពិតប្រាកដ។</string>
     <string name="business_khqr_waiting_auto">After you pay, tap verify — Bakong confirms automatically when the transfer is found.</string>

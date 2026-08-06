@@ -10,7 +10,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.BufferedInputStream
 import java.io.File
+import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 
 /**
@@ -38,9 +40,11 @@ object ApkInstaller {
     suspend fun downloadAndInstall(
         context: Context,
         url: String,
+        expectedSha256: String?,
         onProgress: ((Progress) -> Unit)? = null,
     ): String? = withContext(Dispatchers.IO) {
         if (url.isBlank()) return@withContext "Missing download URL"
+        val cleanSha256 = expectedSha256?.trim()?.lowercase()?.takeIf { it.isNotBlank() }
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
                 !context.packageManager.canRequestPackageInstalls()
@@ -90,6 +94,14 @@ object ApkInstaller {
                     outFile.delete()
                     return@withContext "APK file looks corrupt. Try again."
                 }
+                // Verify SHA256 checksum for security
+                if (cleanSha256 != null) {
+                    val actualSha256 = calculateSha256(outFile)
+                    if (!actualSha256.equals(cleanSha256, ignoreCase = true)) {
+                        outFile.delete()
+                        return@withContext "Update failed security check. Please try again."
+                    }
+                }
             }
 
             withContext(Dispatchers.Main) {
@@ -98,6 +110,21 @@ object ApkInstaller {
             null
         } catch (e: Exception) {
             e.message?.takeIf { it.isNotBlank() } ?: "Could not download update"
+        }
+    }
+
+    /** Calculates the SHA-256 hash of a file. */
+    private fun calculateSha256(file: File): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        BufferedInputStream(file.inputStream()).use { stream ->
+            val buffer = ByteArray(8192)
+            var bytesRead: Int
+            while (stream.read(buffer).also { bytesRead = it } != -1) {
+                digest.update(buffer, 0, bytesRead)
+            }
+        }
+        return digest.digest().joinToString("") {
+            "%02x".format(it)
         }
     }
 
