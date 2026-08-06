@@ -33,6 +33,7 @@ data class DestinationCard(
     val packageDetails: TourPackageDetails? = null,
     val tripDetails: TripDetails? = null,
     val rentalDetails: RentalDetails? = null,
+    val ownerId: String? = null,
 )
 
 object DestinationCatalog {

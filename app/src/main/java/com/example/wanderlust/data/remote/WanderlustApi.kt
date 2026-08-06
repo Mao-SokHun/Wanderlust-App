@@ -172,7 +172,7 @@ interface WanderlustApi {
     @GET("api/billing/history")
     suspend fun getPaymentHistory(
         @Header("Authorization") token: String,
-    ): AdminPaymentsListResponse
+    ): AdminPendingPaymentsResponse
 
     @GET("api/business/me")
     suspend fun getBusinessProfile(@Header("Authorization") token: String): BusinessProfile

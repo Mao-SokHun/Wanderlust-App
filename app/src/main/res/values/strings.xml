@@ -217,6 +217,10 @@
     <string name="saved_plan_ref">Saved · WL-88942</string>
     <string name="saved_plan_location">Siem Reap, Cambodia</string>
     <string name="btn_go_home">Go to Home</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_ok_kh">យល់ព្រម</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_cancel_kh">បោះបង់</string>
 
     <!-- Language -->
     <string name="language_english">English</string>

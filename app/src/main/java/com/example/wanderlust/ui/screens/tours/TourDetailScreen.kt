@@ -67,6 +67,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import com.example.wanderlust.data.SessionManager
 import com.example.wanderlust.data.formatDistanceKm
 import com.example.wanderlust.data.geoForDestination
+import com.example.wanderlust.locale.AppLocale
 import com.example.wanderlust.locale.localizedCategory
 import com.example.wanderlust.locale.localizedDescription
 import com.example.wanderlust.locale.localizedLocation
@@ -136,7 +137,7 @@ private fun TourDetailContent(
                 listingId = destination.id,
                 title = destination.title,
                 priceLabel = destination.priceLabel,
-                imageUrl = gallery.firstOrNull().orEmpty(),
+                imageUrl = destination.imageUrl,
                 category = destination.category,
                 location = destination.location,
             ),
@@ -280,6 +281,10 @@ private fun TourDetailContent(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                     )
+                    val currentDescText = destination.localizedDescription().ifEmpty {
+                        stringLocalized(R.string.tour_default_desc, R.string.tour_default_desc_kh)
+                    }
+                    val isKhmerLang = AppLocale.isKhmer
                     TextButton(
                         onClick = {
                             if (translatedText != null) {
@@ -287,12 +292,9 @@ private fun TourDetailContent(
                             } else {
                                 isTranslating = true
                                 scope.launch {
-                                    val rawDesc = destination.localizedDescription().ifEmpty {
-                                        stringLocalized(R.string.tour_default_desc, R.string.tour_default_desc_kh)
-                                    }
                                     val result = com.example.wanderlust.util.TranslationHelper.translate(
-                                        rawDesc,
-                                        targetLang = if (AppLocale.isKhmer) "en" else "km"
+                                        currentDescText,
+                                        targetLang = if (isKhmerLang) "en" else "km"
                                     )
                                     translatedText = result
                                     isTranslating = false

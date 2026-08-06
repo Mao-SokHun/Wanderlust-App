@@ -396,6 +396,44 @@ fun DirectChatScreen(
             }
         }
     }
+
+    if (showReportDialog) {
+        AlertDialog(
+            onDismissRequest = { showReportDialog = false },
+            title = {
+                Text(stringLocalized(R.string.report_dialog_title, R.string.report_dialog_title_kh))
+            },
+            text = {
+                Text(reportStatus ?: stringLocalized(R.string.report_dialog_text, R.string.report_dialog_text_kh))
+            },
+            confirmButton = {
+                if (reportStatus == null) {
+                    TextButton(onClick = {
+                        reportStatus = "Sending..."
+                        scope.launch {
+                            val msg = "Reporting Business: $hostName. From User ID: ${SessionManager.userId}. Reason: Fraud/Scam via Chat."
+                            val res = supportRepo.sendMessage("Report Chat Scam", msg)
+                            if (res.isSuccess) {
+                                reportStatus = if (AppLocale.isKhmer) "បានបញ្ជូនពាក្យបណ្តឹង។ យើងនឹងត្រួតពិនិត្យឆាប់ៗ។" else "Report sent. We will review it soon."
+                            } else {
+                                reportStatus = "Error sending report."
+                            }
+                        }
+                    }) {
+                        Text(stringLocalized(R.string.report_user, R.string.report_user_kh))
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { 
+                    showReportDialog = false 
+                    reportStatus = null
+                }) {
+                    Text(if (reportStatus == null) stringApp(R.string.btn_cancel) else stringApp(R.string.btn_ok))
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -445,43 +483,5 @@ private fun ChatBubble(message: ChatMessage) {
                 modifier = Modifier.padding(top = 2.dp, start = 4.dp, end = 4.dp),
             )
         }
-    }
-
-    if (showReportDialog) {
-        AlertDialog(
-            onDismissRequest = { showReportDialog = false },
-            title = {
-                Text(stringLocalized(R.string.report_dialog_title, R.string.report_dialog_title_kh))
-            },
-            text = {
-                Text(reportStatus ?: stringLocalized(R.string.report_dialog_text, R.string.report_dialog_text_kh))
-            },
-            confirmButton = {
-                if (reportStatus == null) {
-                    TextButton(onClick = {
-                        reportStatus = "Sending..."
-                        scope.launch {
-                            val msg = "Reporting Business: $hostName. From User ID: ${SessionManager.userId}. Reason: Fraud/Scam via Chat."
-                            val res = supportRepo.sendMessage("Report Chat Scam", msg)
-                            if (res.isSuccess) {
-                                reportStatus = if (AppLocale.isKhmer) "បានបញ្ជូនពាក្យបណ្តឹង។ យើងនឹងត្រួតពិនិត្យឆាប់ៗ។" else "Report sent. We will review it soon."
-                            } else {
-                                reportStatus = "Error sending report."
-                            }
-                        }
-                    }) {
-                        Text(stringLocalized(R.string.report_user, R.string.report_user_kh))
-                    }
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { 
-                    showReportDialog = false 
-                    reportStatus = null
-                }) {
-                    Text(if (reportStatus == null) stringApp(R.string.btn_cancel) else stringApp(R.string.btn_ok))
-                }
-            }
-        )
     }
 }

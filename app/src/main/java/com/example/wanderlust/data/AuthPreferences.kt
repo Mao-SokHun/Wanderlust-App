@@ -41,7 +41,7 @@ object AuthPreferences {
                 context,
                 SEC_PREFS,
                 masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SKEY_DATA_ATREST,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
             )
         } catch (_: Exception) {

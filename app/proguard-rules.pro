@@ -7,7 +7,7 @@
 -keep class com.example.wanderlust.data.model.** { *; }
 
 # Keep Retrofit API interfaces & response classes
--keepinterface com.example.wanderlust.data.remote.** { *; }
+-keep interface com.example.wanderlust.data.remote.** { *; }
 -keepclassmembers class * {
     @retrofit2.http.* <methods>;
 }

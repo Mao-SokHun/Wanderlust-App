@@ -40,7 +40,7 @@ object ApkInstaller {
     suspend fun downloadAndInstall(
         context: Context,
         url: String,
-        expectedSha256: String?,
+        expectedSha256: String? = null,
         onProgress: ((Progress) -> Unit)? = null,
     ): String? = withContext(Dispatchers.IO) {
         if (url.isBlank()) return@withContext "Missing download URL"
