@@ -177,73 +177,88 @@ fun CategoryChipRow(
 }
 
 @Composable
+@Composable
 fun DestinationListCard(
     destination: DestinationCard,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Surface(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .clip(RoundedCornerShape(20.dp))
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        shadowElevation = 2.dp,
     ) {
-        Box(
-            Modifier
-                .size(width = 108.dp, height = 96.dp)
-                .clip(RoundedCornerShape(12.dp)),
+        Row(
+            modifier = Modifier.padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            AsyncImage(
-                destination.imageUrl,
-                destination.localizedTitle(),
-                Modifier.fillMaxWidth().height(96.dp),
-                contentScale = ContentScale.Crop,
-            )
             Box(
                 Modifier
-                    .align(Alignment.TopStart)
-                    .padding(6.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.92f))
-                    .padding(horizontal = 6.dp, vertical = 2.dp),
+                    .size(width = 110.dp, height = 98.dp)
+                    .clip(RoundedCornerShape(16.dp)),
             ) {
-                CategoryBadgeText(
-                    destination = destination,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                AsyncImage(
+                    destination.imageUrl,
+                    destination.localizedTitle(),
+                    Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
                 )
-            }
-        }
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
-            DestinationTitleBlock(destination)
-            Spacer(Modifier.height(2.dp))
-            DestinationLocationLine(destination)
-            Spacer(Modifier.height(4.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    "★ ${destination.rating}",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                )
-                if (destination.duration.isNotEmpty()) {
-                    Spacer(Modifier.width(10.dp))
-                    Text(
-                        destination.duration,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                Box(
+                    Modifier
+                        .align(Alignment.TopStart)
+                        .padding(6.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.primary)
+                        .padding(horizontal = 7.dp, vertical = 3.dp),
+                ) {
+                    CategoryBadgeText(
+                        destination = destination,
+                        color = Color.White,
                     )
                 }
-                if (destination.priceLabel.isNotEmpty()) {
-                    Spacer(Modifier.weight(1f))
-                    Text(
-                        destination.priceLabel,
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+            }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
+                DestinationTitleBlock(destination)
+                Spacer(Modifier.height(3.dp))
+                DestinationLocationLine(destination)
+                Spacer(Modifier.height(6.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color(0xFFF59E0B).copy(alpha = 0.15f))
+                            .padding(horizontal = 6.dp, vertical = 2.dp),
+                    ) {
+                        Text(
+                            "★ ${destination.rating}",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color(0xFFF59E0B),
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                    if (destination.duration.isNotEmpty()) {
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            destination.duration,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    if (destination.priceLabel.isNotEmpty()) {
+                        Spacer(Modifier.weight(1f))
+                        Text(
+                            destination.priceLabel,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
                 }
             }
         }
@@ -260,49 +275,94 @@ fun FeaturedHeroCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(210.dp)
-            .clip(RoundedCornerShape(18.dp))
+            .height(230.dp)
+            .clip(RoundedCornerShape(22.dp))
             .clickable(onClick = onClick),
     ) {
         AsyncImage(
             destination.imageUrl,
             destination.localizedTitle(),
-            Modifier.fillMaxWidth().height(210.dp),
+            Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
         )
         Box(
             Modifier
-                .fillMaxWidth()
-                .height(210.dp)
+                .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        listOf(Color.Transparent, Color.Black.copy(alpha = 0.82f)),
+                        listOf(Color.Transparent, Color.Black.copy(alpha = 0.88f)),
                     ),
                 ),
         )
-        Column(Modifier.align(Alignment.BottomStart).padding(16.dp)) {
+        // Rating Badge Top Right
+        Box(
+            Modifier
+                .align(Alignment.TopEnd)
+                .padding(14.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFFFF6B35))
+                .padding(horizontal = 10.dp, vertical = 5.dp),
+        ) {
             Text(
-                "$featuredLabel • ${destination.localizedCategory()}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primaryContainer,
+                "★ ${destination.rating}",
+                style = MaterialTheme.typography.labelMedium,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
             )
+        }
+
+        Column(
+            Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp),
+        ) {
+            Box(
+                Modifier
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(Color.White.copy(alpha = 0.2f))
+                    .padding(horizontal = 8.dp, vertical = 3.dp),
+            ) {
+                Text(
+                    "$featuredLabel • ${destination.localizedCategory()}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+            Spacer(Modifier.height(6.dp))
             Text(
                 destination.localizedTitle(),
                 color = Color.White,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
             )
-            Text(
-                destination.localizedLocation(),
-                color = Color.White.copy(alpha = 0.9f),
-                style = MaterialTheme.typography.bodySmall,
-            )
-            Text(
-                "★ ${destination.rating}",
-                color = Color.White,
-                style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.padding(top = 4.dp),
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    destination.localizedLocation(),
+                    color = Color.White.copy(alpha = 0.85f),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                if (destination.priceLabel.isNotEmpty()) {
+                    Box(
+                        Modifier
+                            .clip(RoundedCornerShape(99.dp))
+                            .background(Color(0xFFFF6B35))
+                            .padding(horizontal = 14.dp, vertical = 6.dp),
+                    ) {
+                        Text(
+                            destination.priceLabel,
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
+            }
         }
     }
 }
+

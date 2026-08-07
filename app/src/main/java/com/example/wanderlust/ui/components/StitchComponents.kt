@@ -265,12 +265,14 @@ fun StitchGhostCard(
     val border = if (dark) WanderlustDark.GhostBorder else WanderlustLight.GhostBorder
     Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, border),
+        shadowElevation = if (dark) 2.dp else 4.dp,
         content = content,
     )
 }
+
 
 /** Image tour card — same style as Admin “Experience Catalog Highlights”. */
 @Composable

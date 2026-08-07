@@ -57,87 +57,92 @@ val Red400     = Color(0xFFF87171)
 // ─────────────────────────────────────────────────────────────────────────────
 // Dark Mode — Nature Explorer Dark
 // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Wanderlust — Modern Coral & Teal Glassmorphic Palette
+// Primary  : Warm Coral Orange (#FF6B35)
+// Secondary: Vibrant Teal     (#00ABA7)
+// Dark Bg  : Deep Obsidian    (#0B0F17)
+// ─────────────────────────────────────────────────────────────────────────────
+
+val Coral500  = Color(0xFFFF6B35)   // Warm Coral Primary
+val Coral600  = Color(0xFFE5531F)
+val Coral400  = Color(0xFFFF8559)
+val Coral100  = Color(0xFFFFECE5)
+
+val Teal500   = Color(0xFF00ABA7)   // Vibrant Teal Secondary
+val Teal600   = Color(0xFF008985)
+val Teal400   = Color(0xFF26C6C2)
+val Teal100   = Color(0xFFD6F7F6)
+
+val Obsidian950 = Color(0xFF0B0F17)
+val Obsidian900 = Color(0xFF151C28)
+val Obsidian800 = Color(0xFF1E2838)
+val Obsidian700 = Color(0xFF2B394E)
+val Obsidian600 = Color(0xFF3F516B)
+
 object WanderlustDark {
-    // Backgrounds & surfaces
-    val Background            = Color(0xFF0D1512)   // Very dark green-tinted black
-    val OnBackground          = Color(0xFFD1FAE5)   // Emerald 100
-    val Surface               = Color(0xFF121A16)   // Dark green-tinted surface
-    val OnSurface             = Color(0xFFE2F5EC)
-    val SurfaceContainer      = Color(0xFF1A2820)   // Elevated card bg
-    val SurfaceContainerHigh  = Color(0xFF1F3328)
-    val SurfaceContainerLow   = Color(0xFF151E19)
+    val Background            = Obsidian950        // #0B0F17 — Deep Obsidian
+    val OnBackground          = Color(0xFFF1F5F9)
+    val Surface               = Obsidian900        // #151C28 — Sleek dark card surface
+    val OnSurface             = Color(0xFFF8FAFC)
+    val SurfaceContainer      = Obsidian800        // #1E2838
+    val SurfaceContainerHigh  = Obsidian700
+    val SurfaceContainerLow   = Obsidian950
 
-    // Text on surface
-    val OnSurfaceVariant      = Color(0xFFA7F3D0)   // Emerald 200 — secondary text
+    val OnSurfaceVariant      = Color(0xFF94A3B8)
 
-    // Outline
-    val Outline               = Color(0xFF34D399)   // Emerald 400
-    val OutlineVariant        = Color(0xFF047857)   // Emerald 700 — subtle borders
+    val Outline               = Coral500
+    val OutlineVariant        = Color(0xFF263346)
 
-    // Primary — Emerald
-    val Primary               = Color(0xFF34D399)   // Emerald 400 — readable on dark
-    val PrimaryContainer      = Color(0xFF059669)   // Emerald 600 — filled buttons
+    val Primary               = Coral500           // #FF6B35 — Warm Coral
+    val PrimaryContainer      = Coral600
     val OnPrimaryContainer    = Color(0xFFFFFFFF)
 
-    // Secondary — Amber
-    val Secondary             = Color(0xFFFBBF24)   // Amber 400
-    val SecondaryContainer    = Color(0xFFD97706)   // Amber 600
-    val OnSecondaryContainer  = Color(0xFF1C1007)
+    val Secondary             = Teal500            // #00ABA7 — Vibrant Teal
+    val SecondaryContainer    = Teal600
+    val OnSecondaryContainer  = Color(0xFFFFFFFF)
 
-    // Tertiary — Sky Blue
-    val Tertiary              = Color(0xFF38BDF8)   // Sky 400
-    val TertiaryContainer     = Color(0xFF0284C7)   // Sky 600
+    val Tertiary              = Color(0xFFF59E0B)   // Rating Gold
+    val TertiaryContainer     = Color(0xFFD97706)
     val OnTertiaryContainer   = Color(0xFFFFFFFF)
 
-    // Error
-    val Error                 = Color(0xFFF87171)   // Red 400
-    val OnError               = Color(0xFF7F1D1D)
-
-    // Glass / ghost
-    val GlassBg               = Color(0x991A2820)
-    val GhostBorder           = Color.White.copy(alpha = 0.1f)
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Light Mode — Nature Explorer Light
-// ─────────────────────────────────────────────────────────────────────────────
-object WanderlustLight {
-    // Backgrounds & surfaces
-    val Background            = Slate50              // #F8FAFC — Clean Slate White
-    val OnBackground          = Slate900             // #1E293B — Charcoal Slate text
-    val Surface               = Color(0xFFFFFFFF)    // Pure white cards
-    val OnSurface             = Slate900
-    val SurfaceContainer      = Color(0xFFF0FDF8)    // Slight green tint on containers
-    val SurfaceContainerHigh  = Slate200             // #E2E8F0
-    val SurfaceContainerLow   = Color(0xFFF7FDFB)
-
-    // Text on surface
-    val OnSurfaceVariant      = Slate700             // #334155 — secondary text
-
-    // Outline
-    val Outline               = Color(0xFF6EE7B7)    // Emerald 300
-    val OutlineVariant        = Emerald100            // Very subtle green border
-
-    // Primary — Emerald
-    val Primary               = Emerald700           // #047857 — readable on white
-    val PrimaryContainer      = Emerald600           // #059669 — filled button bg
-    val OnPrimaryContainer    = Color(0xFFFFFFFF)
-
-    // Secondary — Amber
-    val Secondary             = Amber600             // #D97706
-    val SecondaryContainer    = Amber500             // #F59E0B
-    val OnSecondaryContainer  = Color(0xFF1C1007)
-
-    // Tertiary — Sky Blue
-    val Tertiary              = Sky600               // #0284C7
-    val TertiaryContainer     = Sky400               // #38BDF8
-    val OnTertiaryContainer   = Color(0xFFFFFFFF)
-
-    // Error
-    val Error                 = Red700               // #B91C1C
+    val Error                 = Color(0xFFEF4444)
     val OnError               = Color(0xFFFFFFFF)
 
-    // Glass / ghost
-    val GlassBg               = Color(0xCCF0FDF8)
-    val GhostBorder            = Emerald700.copy(alpha = 0.15f)
+    val GlassBg               = Color(0xD9151C28)
+    val GhostBorder           = Color(0xFF263346)
 }
+
+object WanderlustLight {
+    val Background            = Color(0xFFF8FAFC)
+    val OnBackground          = Color(0xFF0F172A)
+    val Surface               = Color(0xFFFFFFFF)
+    val OnSurface             = Color(0xFF0F172A)
+    val SurfaceContainer      = Color(0xFFF1F5F9)
+    val SurfaceContainerHigh  = Color(0xFFE2E8F0)
+    val SurfaceContainerLow   = Color(0xFFF8FAFC)
+
+    val OnSurfaceVariant      = Color(0xFF475569)
+
+    val Outline               = Coral500
+    val OutlineVariant        = Color(0xFFCBD5E1)
+
+    val Primary               = Coral600           // #E5531F
+    val PrimaryContainer      = Coral500
+    val OnPrimaryContainer    = Color(0xFFFFFFFF)
+
+    val Secondary             = Teal600            // #008985
+    val SecondaryContainer    = Teal500
+    val OnSecondaryContainer  = Color(0xFFFFFFFF)
+
+    val Tertiary              = Color(0xFFD97706)
+    val TertiaryContainer     = Color(0xFFF59E0B)
+    val OnTertiaryContainer   = Color(0xFFFFFFFF)
+
+    val Error                 = Color(0xFFDC2626)
+    val OnError               = Color(0xFFFFFFFF)
+
+    val GlassBg               = Color(0xF7FFFFFF)
+    val GhostBorder           = Color(0xFFE2E8F0)
+}
+
