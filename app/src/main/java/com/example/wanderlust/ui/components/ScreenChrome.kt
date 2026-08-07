@@ -293,7 +293,7 @@ fun FeaturedHeroCard(
                     ),
                 ),
         )
-        // Rating Badge Top Right
+        // Dynamic Rating Badge Top Right
         Surface(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -306,8 +306,10 @@ fun FeaturedHeroCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                Text("★ 4.9", style = MaterialTheme.typography.labelMedium, color = Color.White, fontWeight = FontWeight.Bold)
-                Text("7,845 Reviews", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.95f))
+                Text("★ ${destination.rating}", style = MaterialTheme.typography.labelMedium, color = Color.White, fontWeight = FontWeight.Bold)
+                if (destination.ratingCount > 0) {
+                    Text("(${destination.ratingCount})", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.95f))
+                }
             }
         }
 
@@ -334,13 +336,15 @@ fun FeaturedHeroCard(
                 )
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    if (destination.priceLabel.isNotBlank()) destination.priceLabel else "$85 / person",
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(Modifier.height(4.dp))
+                if (destination.priceLabel.isNotBlank()) {
+                    Text(
+                        destination.priceLabel,
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                }
                 Surface(
                     modifier = Modifier
                         .clip(RoundedCornerShape(99.dp))
@@ -349,7 +353,7 @@ fun FeaturedHeroCard(
                     color = Color(0xFFFF6B35),
                 ) {
                     Text(
-                        "BOOK NOW",
+                        "EXPLORE",
                         color = Color.White,
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
@@ -360,5 +364,6 @@ fun FeaturedHeroCard(
         }
     }
 }
+
 
 
