@@ -271,7 +271,6 @@ fun FeaturedHeroCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val featuredLabel = stringLocalized(R.string.featured_label, R.string.featured_label_kh)
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -290,79 +289,76 @@ fun FeaturedHeroCard(
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        listOf(Color.Transparent, Color.Black.copy(alpha = 0.88f)),
+                        listOf(Color.Transparent, Color.Black.copy(alpha = 0.90f)),
                     ),
                 ),
         )
         // Rating Badge Top Right
-        Box(
-            Modifier
+        Surface(
+            modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(14.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color(0xFFFF6B35))
-                .padding(horizontal = 10.dp, vertical = 5.dp),
+                .padding(14.dp),
+            shape = RoundedCornerShape(12.dp),
+            color = Color(0xFFF59E0B),
         ) {
-            Text(
-                "★ ${destination.rating}",
-                style = MaterialTheme.typography.labelMedium,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-            )
+            Row(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text("★ 4.9", style = MaterialTheme.typography.labelMedium, color = Color.White, fontWeight = FontWeight.Bold)
+                Text("7,845 Reviews", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.95f))
+            }
         }
 
-        Column(
-            Modifier
+        Row(
+            modifier = Modifier
                 .align(Alignment.BottomStart)
+                .fillMaxWidth()
                 .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom,
         ) {
-            Box(
-                Modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(Color.White.copy(alpha = 0.2f))
-                    .padding(horizontal = 8.dp, vertical = 3.dp),
-            ) {
+            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                 Text(
-                    "$featuredLabel • ${destination.localizedCategory()}",
-                    style = MaterialTheme.typography.labelSmall,
+                    destination.localizedTitle(),
                     color = Color.White,
-                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
                 )
-            }
-            Spacer(Modifier.height(6.dp))
-            Text(
-                destination.localizedTitle(),
-                color = Color.White,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
                 Text(
                     destination.localizedLocation(),
                     color = Color.White.copy(alpha = 0.85f),
                     style = MaterialTheme.typography.bodySmall,
                 )
-                if (destination.priceLabel.isNotEmpty()) {
-                    Box(
-                        Modifier
-                            .clip(RoundedCornerShape(99.dp))
-                            .background(Color(0xFFFF6B35))
-                            .padding(horizontal = 14.dp, vertical = 6.dp),
-                    ) {
-                        Text(
-                            destination.priceLabel,
-                            color = Color.White,
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
+            }
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    if (destination.priceLabel.isNotBlank()) destination.priceLabel else "$85 / person",
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(Modifier.height(4.dp))
+                Surface(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(99.dp))
+                        .clickable(onClick = onClick),
+                    shape = RoundedCornerShape(99.dp),
+                    color = Color(0xFFFF6B35),
+                ) {
+                    Text(
+                        "BOOK NOW",
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                    )
                 }
             }
         }
     }
 }
+
 

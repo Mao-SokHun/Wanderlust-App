@@ -33,7 +33,10 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.TravelExplore
+
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
@@ -218,26 +221,46 @@ fun ThemeToggleButton(
 }
 
 @Composable
-fun WanderlustBrand(modifier: Modifier = Modifier) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        WanderlustLogo(size = 36.dp, style = WanderlustLogoStyle.Icon)
-        Spacer(Modifier.width(10.dp))
-        Column {
+fun WanderlustBrand(
+    modifier: Modifier = Modifier,
+    onProfileClick: (() -> Unit)? = null,
+    onSettingsClick: (() -> Unit)? = null,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            WanderlustLogo(size = 34.dp, style = WanderlustLogoStyle.Icon)
+            Spacer(Modifier.width(10.dp))
             Text(
-                "Wanderlust",
-                style = MaterialTheme.typography.titleLarge,
+                "WANDERLUST CAMBODIA",
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
+                color = Color(0xFFFF6B35),
+                letterSpacing = 0.8.sp,
             )
-            Text(
-                stringApp(R.string.brand_tagline),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f),
-                letterSpacing = 0.6.sp,
-            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { onProfileClick?.invoke() }) {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Profile",
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f),
+                )
+            }
+            IconButton(onClick = { onSettingsClick?.invoke() }) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings",
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f),
+                )
+            }
         }
     }
 }
+
 
 @Composable
 fun StitchGlassCard(
