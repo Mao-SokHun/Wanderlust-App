@@ -140,6 +140,8 @@ fun BusinessStudioScreen(
     var savingCompany by remember { mutableStateOf(false) }
     var companySaved by remember { mutableStateOf(false) }
 
+    // NOTE: Company name editing has been moved to EditProfile for cleaner UX.
+
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("Temple") }
@@ -307,55 +309,6 @@ fun BusinessStudioScreen(
                 }
             }
 
-            SettingsSectionTitle(stringApp(R.string.business_company_settings))
-            StitchGhostCard(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
-                Column(
-                    Modifier.padding(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    OutlinedTextField(
-                        value = companyNameDraft,
-                        onValueChange = { companyNameDraft = it.take(150) },
-                        label = { Text(stringApp(R.string.business_company_name)) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    if (companySaved) {
-                        Text(
-                            stringApp(R.string.business_company_saved),
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
-                    Button(
-                        enabled = !savingCompany && Validation.requireCompany(companyNameDraft) == null,
-                        onClick = {
-                            val err = Validation.requireCompany(companyNameDraft)
-                            if (err != null) {
-                                error = err
-                                return@Button
-                            }
-                            scope.launch {
-                                savingCompany = true
-                                companySaved = false
-                                error = null
-                                repo.updateBusinessProfile(
-                                    BusinessProfileUpdateRequest(companyName = companyNameDraft.trim()),
-                                ).onSuccess {
-                                    profile = it
-                                    companySaved = true
-                                }.onFailure { error = it.message }
-                                savingCompany = false
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(
-                            if (savingCompany) "…" else stringApp(R.string.business_save_changes),
-                        )
-                    }
-                }
-            }
 
             val expiryLabel = sub?.expiresAt.orEmpty().take(10)
             if (sub != null && sub.status != "none") {

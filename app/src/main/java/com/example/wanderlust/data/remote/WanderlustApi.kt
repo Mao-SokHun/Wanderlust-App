@@ -46,6 +46,9 @@ import com.example.wanderlust.data.model.AppSupportInfo
 import com.example.wanderlust.data.model.Tour
 import com.example.wanderlust.data.model.ChatApiMessage
 import com.example.wanderlust.data.model.ChatApiSendRequest
+import com.example.wanderlust.data.model.UserBooking
+import com.example.wanderlust.data.model.BookTourRequest
+import com.example.wanderlust.data.model.BookTourResponse
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -304,4 +307,16 @@ interface WanderlustApi {
     suspend fun translateText(
         @Body request: com.example.wanderlust.data.model.TranslateRequest,
     ): com.example.wanderlust.data.model.TranslateResponse
+
+    @GET("api/bookings")
+    suspend fun getMyBookings(
+        @Header("Authorization") token: String,
+    ): List<UserBooking>
+
+    @POST("api/tours/{id}/book")
+    suspend fun bookTour(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+        @Body request: BookTourRequest,
+    ): BookTourResponse
 }

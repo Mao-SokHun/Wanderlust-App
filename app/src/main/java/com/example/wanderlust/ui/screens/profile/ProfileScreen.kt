@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Policy
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -36,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.example.wanderlust.locale.AppLocale
 import com.example.wanderlust.locale.stringApp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -64,6 +67,7 @@ fun ProfileScreen(
     onLogout: () -> Unit,
     onSignIn: () -> Unit,
     onRegister: () -> Unit,
+    businessCompanyName: String = "",
 ) {
     if (!SessionManager.isLoggedIn()) {
         Column(Modifier.fillMaxSize()) {
@@ -75,7 +79,20 @@ fun ProfileScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 WanderlustBrand()
-                ThemeToggleButton(isDark = isDarkTheme, onToggle = onToggleTheme)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Globe: quick language switch
+                    IconButton(onClick = {
+                        val next = if (AppLocale.isKhmer) "en" else "km"
+                        SessionManager.setLanguage(next)
+                    }) {
+                        Icon(
+                            Icons.Default.Language,
+                            contentDescription = "Switch Language",
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                    ThemeToggleButton(isDark = isDarkTheme, onToggle = onToggleTheme)
+                }
             }
             LoginRequiredPanel(onSignIn = onSignIn, onRegister = onRegister)
         }
@@ -104,7 +121,20 @@ fun ProfileScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     WanderlustBrand()
-                    ThemeToggleButton(isDark = isDarkTheme, onToggle = onToggleTheme)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // Globe: quick language switch
+                        IconButton(onClick = {
+                            val next = if (AppLocale.isKhmer) "en" else "km"
+                            SessionManager.setLanguage(next)
+                        }) {
+                            Icon(
+                                Icons.Default.Language,
+                                contentDescription = "Switch Language",
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                        ThemeToggleButton(isDark = isDarkTheme, onToggle = onToggleTheme)
+                    }
                 }
             }
             Column(
@@ -121,12 +151,30 @@ fun ProfileScreen(
                     ProfileAvatar(size = 64.dp, displayName = name)
                     Column(Modifier.weight(1f).padding(start = 14.dp)) {
                         Text(name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                        Text(
-                            stringApp(R.string.profile_tier),
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold,
-                        )
+                        // Role badge (no "Gold Explorer" — show real role)
+                        val roleLabel = when (SessionManager.userRole) {
+                            "ADMIN" -> "Admin"
+                            "BUSINESS" -> "Business"
+                            else -> null
+                        }
+                        roleLabel?.let {
+                            Text(
+                                it,
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+                        // Company name for business users
+                        if (SessionManager.userRole == "BUSINESS" && businessCompanyName.isNotBlank()) {
+                            Text(
+                                businessCompanyName,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.secondary,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.padding(top = 1.dp),
+                            )
+                        }
                         if (email.isNotBlank()) {
                             Text(
                                 email,

@@ -245,3 +245,43 @@ data class TranslateResponse(
     val targetLang: String = "en",
     val isAutoTranslated: Boolean = true,
 )
+
+/** A real booking record from /api/bookings */
+data class UserBooking(
+    val id: String = "",
+    val bookingRef: String = "",
+    val tourId: String = "",
+    val title: String = "",
+    val listingType: String = "TOUR",
+    val priceLabel: String = "",
+    val priceUsd: Double = 0.0,
+    val imageUrl: String = "",
+    val location: String = "",
+    val duration: String = "",
+    val status: String = "PENDING",
+    val bookingDate: String = "",
+    val travelDate: String = "",
+    val passengerName: String = "",
+    val seatNumber: String = "",
+    val specialRequests: String = "",
+    val providerName: String = "",
+    val providerPhone: String = "",
+)
+
+data class BookTourRequest(
+    val passengerName: String = "",
+    val seatNumber: String = "",
+    val travelDate: String = "",
+    val specialRequests: String = "",
+)
+
+data class BookTourResponse(
+    val id: String = "",
+    val bookingRef: String = "",
+    val tourId: String = "",
+    val title: String = "",
+    val status: String = "PENDING",
+    val bookingDate: String = "",
+    val message: String = "",
+)
+

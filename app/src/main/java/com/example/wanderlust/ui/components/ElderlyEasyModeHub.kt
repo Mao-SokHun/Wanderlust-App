@@ -197,14 +197,14 @@ private fun EasyActionButton(
 ) {
     Surface(
         color = containerColor,
-        shape = RoundedCornerShape(16.dp),
-        shadowElevation = 3.dp,
+        shape = RoundedCornerShape(14.dp),
+        shadowElevation = 2.dp,
         modifier = modifier
-            .height(90.dp)
+            .height(72.dp)
             .clickable { onClick() },
     ) {
         Column(
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier.padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -212,13 +212,13 @@ private fun EasyActionButton(
                 icon,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(24.dp),
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 if (AppLocale.isKhmer) labelKh else labelEn,
                 color = Color.White,
-                fontSize = 13.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
             )
         }

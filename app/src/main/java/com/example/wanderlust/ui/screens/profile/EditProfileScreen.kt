@@ -34,7 +34,11 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.wanderlust.data.SessionManager
+import com.example.wanderlust.data.repository.BusinessRepository
+import com.example.wanderlust.data.model.BusinessProfileUpdateRequest
 import com.example.wanderlust.ui.components.ProfileAvatar
 import com.example.wanderlust.ui.components.SettingsNavRow
 import com.example.wanderlust.ui.components.StickyScrollScreen
@@ -70,6 +76,11 @@ fun EditProfileScreen(
     val snackbar = remember { SnackbarHostState() }
     val fieldShape = RoundedCornerShape(14.dp)
     val fieldFill = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val isBusiness = SessionManager.userRole == "BUSINESS"
+    var companyNameDraft by remember { mutableStateOf("") }
+    var savingCompany by remember { mutableStateOf(false) }
+    var companySavedMsg by remember { mutableStateOf<String?>(null) }
 
     val genderOptions = listOf(
         "" to stringApp(R.string.gender_prefer_not),
@@ -95,6 +106,15 @@ fun EditProfileScreen(
             delay(250)
             viewModel.clearSavedFlag()
             onBack()
+        }
+    }
+
+    // Load company name for Business users
+    LaunchedEffect(isBusiness) {
+        if (isBusiness) {
+            BusinessRepository().getBusinessProfile().onSuccess {
+                companyNameDraft = it.companyName.orEmpty()
+            }
         }
     }
 
@@ -336,15 +356,64 @@ fun EditProfileScreen(
         ) {
             MetaRow(
                 stringApp(R.string.label_account_type),
-                if (SessionManager.isAdmin()) {
-                    stringApp(R.string.account_type_admin)
-                } else {
-                    stringApp(R.string.account_type_user)
+                when (SessionManager.userRole) {
+                    "ADMIN" -> stringApp(R.string.account_type_admin)
+                    "BUSINESS" -> "Business Account"
+                    else -> stringApp(R.string.account_type_user)
                 },
             )
             if (state.nationality.isNotBlank()) {
                 Spacer(Modifier.height(10.dp))
                 MetaRow(stringApp(R.string.label_nationality), state.nationality)
+            }
+        }
+
+        // Company name section for BUSINESS users
+        if (isBusiness) {
+            Spacer(Modifier.height(22.dp))
+            SectionLabel("Company Name")
+            ProfileField(
+                value = companyNameDraft,
+                onValueChange = { companyNameDraft = it.take(150) },
+                label = "Company / Business Name",
+                shape = fieldShape,
+                fill = fieldFill,
+                enabled = !savingCompany,
+                placeholder = "e.g. Angkor Travel Tours",
+                supporting = "${companyNameDraft.length}/150",
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Words,
+                    imeAction = androidx.compose.ui.text.input.ImeAction.Done,
+                ),
+                keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { focusManager.clearFocus() }),
+            )
+            Spacer(Modifier.height(8.dp))
+            companySavedMsg?.let {
+                Text(it, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(4.dp))
+            }
+            Button(
+                onClick = {
+                    focusManager.clearFocus()
+                    scope.launch {
+                        savingCompany = true
+                        companySavedMsg = null
+                        BusinessRepository().updateBusinessProfile(
+                            BusinessProfileUpdateRequest(companyName = companyNameDraft.trim())
+                        ).onSuccess {
+                            companySavedMsg = "Company name saved!"
+                        }.onFailure {
+                            companySavedMsg = "Save failed: ${it.message}"
+                        }
+                        savingCompany = false
+                    }
+                },
+                enabled = !savingCompany && companyNameDraft.length >= 2,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape = RoundedCornerShape(14.dp),
+            ) {
+                if (savingCompany) CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
+                else Text("Save Company Name", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold))
             }
         }
 

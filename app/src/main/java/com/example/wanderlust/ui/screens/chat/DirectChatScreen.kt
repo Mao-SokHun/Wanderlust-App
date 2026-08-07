@@ -99,6 +99,7 @@ fun DirectChatScreen(
 
     LaunchedEffect(partnerId) {
         if (partnerId.isBlank()) return@LaunchedEffect
+        if (SessionManager.token.isNullOrBlank()) return@LaunchedEffect
         while (true) {
             try {
                 chatRepo.getChatHistory(partnerId).onSuccess { apiMessages ->
@@ -134,6 +135,21 @@ fun DirectChatScreen(
     fun sendMessage(text: String) {
         val trimmed = text.trim()
         if (trimmed.isBlank() || partnerId.isBlank()) return
+        if (SessionManager.token.isNullOrBlank()) {
+            // User not logged in — add a local system message to let them know
+            messages.add(ChatMessage(
+                senderId = "system",
+                senderName = "System",
+                senderRole = "SYSTEM",
+                text = if (com.example.wanderlust.locale.AppLocale.isKhmer)
+                    "សូម​ចូល​គណនី​មុន​ពេល​ផ្ញើ​សារ"
+                else
+                    "Please log in to send messages.",
+                timestamp = System.currentTimeMillis(),
+                isFromUser = false,
+            ))
+            return
+        }
         
         // Optimistic UI
         val optimistic = ChatMessage(
