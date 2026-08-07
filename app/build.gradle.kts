@@ -41,8 +41,9 @@ android {
         // Bump BOTH when shipping an update (see backend/APP_UPDATE.md).
         // SemVer versionName (X.Y.Z). versionCode must always increase for Android upgrades.
         // Start at 100 so sideload upgrades from the old Mao-SokHun/Wanderlust APKs still work.
-        versionCode = 102
-        versionName = "1.2.0"
+        versionCode = 103
+        versionName = "1.3.0"
+
         ndk {
             // Phone ABIs only — smaller APK, fewer install failures after Play Protect.
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
