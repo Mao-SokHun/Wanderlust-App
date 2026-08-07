@@ -315,18 +315,27 @@ class NearbyPlacesViewModel(application: Application) : AndroidViewModel(applica
                 )
                 refreshSavedPlaceMarks()
             }.onFailure { err ->
+                val rawMsg = err.message.orEmpty()
+                val friendlyError = if (rawMsg.contains("Unable to resolve host", ignoreCase = true) ||
+                    rawMsg.contains("UnknownHostException", ignoreCase = true) ||
+                    rawMsg.contains("connect", ignoreCase = true)
+                ) {
+                    "offline"
+                } else {
+                    rawMsg.ifBlank { "Could not load nearby places. Enable Places API for your key." }
+                }
                 uiState = uiState.copy(
                     places = emptyList(),
                     compareTop = emptyList(),
                     bestPickId = null,
                     isLoadingPlaces = false,
                     resultsVersion = uiState.resultsVersion + 1,
-                    errorMessage = err.message
-                        ?: "Could not load nearby places. Enable Places API (New) for your key.",
+                    errorMessage = friendlyError,
                 )
             }
         }
     }
+
 
     private fun applyFiltersAndSort(source: List<NearbyPlace>): List<NearbyPlace> {
         var list = source

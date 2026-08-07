@@ -8,7 +8,10 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.ExperimentalFoundationApi
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -42,7 +45,14 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Store
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.WifiOff
+import androidx.compose.material3.ButtonDefaults
+import com.example.wanderlust.locale.AppLocale
 import androidx.compose.material3.Button
+
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -303,12 +313,11 @@ fun NearbyPlacesExplorer(
                     when {
                         state.isLoadingPlaces -> LoadingBlock(stringApp(R.string.nearby_loading_places))
                         state.errorMessage != null && state.places.isEmpty() -> {
-                            Text(
-                                state.errorMessage.orEmpty(),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.bodySmall,
+                            OfflineBannerCard(
+                                onRetry = { viewModel.loadPlaces() },
                             )
                         }
+
                         else -> {
                             if (state.compareTop.isNotEmpty()) {
                                 CompareTopStrip(
@@ -427,7 +436,74 @@ fun NearbyPlacesExplorer(
 }
 
 @Composable
+fun OfflineBannerCard(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val isKhmer = AppLocale.isKhmer
+    androidx.compose.material3.Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, Color(0xFFFF6B35).copy(alpha = 0.35f)),
+        shadowElevation = 2.dp,
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Box(
+                Modifier
+                    .size(52.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFF6B35).copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.WifiOff,
+                    contentDescription = "Offline",
+                    tint = Color(0xFFFF6B35),
+                    modifier = Modifier.size(26.dp),
+                )
+            }
+            Text(
+                text = if (isKhmer) "📶 គ្មានការតភ្ជាប់អ៊ីនធឺណិត (Offline Mode)" else "📶 You are currently offline",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = if (isKhmer)
+                    "ផ្ទាំងទីតាំង និងព័ត៌មានដែលបានរក្សាទុក (Offline Saved Places) នៅតែអាចមើលបានដដែល។ សូមពិនិត្យមើលការតភ្ជាប់សេវា ឬ Wi-Fi របស់អ្នក។"
+                else
+                    "Your saved places & offline maps remain accessible. Check your internet connection or Wi-Fi to load live nearby data.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            )
+            Button(
+                onClick = onRetry,
+                shape = RoundedCornerShape(99.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6B35)),
+            ) {
+                Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    text = if (isKhmer) "ព្យាយាមភ្ជាប់ឡើងវិញ" else "Retry Connection",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun RecentPlacesRow(
+
     recent: List<RecentNearbyPlace>,
     onSelect: (RecentNearbyPlace) -> Unit,
 ) {
