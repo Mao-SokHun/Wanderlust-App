@@ -41,7 +41,9 @@ import com.example.wanderlust.data.SessionManager
 import com.example.wanderlust.data.destinationsNear
 import com.example.wanderlust.data.formatDistanceKm
 import com.example.wanderlust.data.resolvedGeo
+import com.example.wanderlust.data.toDestinationCard
 import com.example.wanderlust.locale.localizedLocation
+
 import com.example.wanderlust.locale.stringLocalized
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -98,10 +100,36 @@ fun NearbyMapSection(
         }
     }
 
-    val nearby = remember(userLatLng) {
-        val pos = userLatLng ?: return@remember emptyList()
-        GuestAccess.limitForGuest(destinationsNear(pos.latitude, pos.longitude))
+    var realNearbyTours by remember { mutableStateOf<List<NearbyDestination>>(emptyList()) }
+
+    LaunchedEffect(userLatLng) {
+        val pos = userLatLng ?: return@LaunchedEffect
+        com.example.wanderlust.data.repository.TourRepositoryProvider.instance.getTours(
+            lat = pos.latitude,
+            lng = pos.longitude,
+            radiusKm = 50.0,
+            sort = "distance",
+        ).onSuccess { list ->
+            if (list.isNotEmpty()) {
+                realNearbyTours = list.map { tour ->
+                    val card = tour.toDestinationCard()
+                    val geo = card.resolvedGeo()
+                    val dist = com.example.wanderlust.data.distanceKm(pos.latitude, pos.longitude, geo.latitude, geo.longitude)
+                    NearbyDestination(destination = card, distanceKm = dist)
+                }.sortedBy { it.distanceKm }
+            }
+        }
     }
+
+    val nearby = remember(userLatLng, realNearbyTours) {
+        if (realNearbyTours.isNotEmpty()) {
+            GuestAccess.limitForGuest(realNearbyTours)
+        } else {
+            val pos = userLatLng ?: return@remember emptyList()
+            GuestAccess.limitForGuest(destinationsNear(pos.latitude, pos.longitude))
+        }
+    }
+
 
     Column(modifier = modifier.fillMaxWidth()) {
         Text(

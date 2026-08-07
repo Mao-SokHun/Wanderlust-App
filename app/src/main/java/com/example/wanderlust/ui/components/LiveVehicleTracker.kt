@@ -41,7 +41,20 @@ fun LiveVehicleTracker(
     status: LiveVehicleStatus = SampleVehicleStatus.sampleBus,
     modifier: Modifier = Modifier,
 ) {
+    var liveStatus by remember { androidx.compose.runtime.mutableStateOf(status) }
+
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        runCatching {
+            val api = com.example.wanderlust.data.remote.ApiConnection.create()
+            val fetched = api.getVehicleLocation("bus-wl-998")
+            liveStatus = fetched
+        }
+    }
+
+    val currentStatus = liveStatus
+
     StitchGhostCard(modifier = modifier.fillMaxWidth()) {
+
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             // Header
             Row(
@@ -66,7 +79,7 @@ fun LiveVehicleTracker(
                             fontWeight = FontWeight.Bold,
                         )
                         Text(
-                            "${status.busOperator} · ${status.plateNumber}",
+                            "${currentStatus.busOperator} · ${currentStatus.plateNumber}",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -93,12 +106,12 @@ fun LiveVehicleTracker(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text(status.originCity, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-                    Text(status.destinationCity, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                    Text(currentStatus.originCity, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                    Text(currentStatus.destinationCity, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                 }
 
                 LinearProgressIndicator(
-                    progress = { status.progressPercent },
+                    progress = { currentStatus.progressPercent },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp)
@@ -106,6 +119,7 @@ fun LiveVehicleTracker(
                     color = MaterialTheme.colorScheme.primary,
                 )
             }
+
 
             // Metrics Cards Row
             Row(

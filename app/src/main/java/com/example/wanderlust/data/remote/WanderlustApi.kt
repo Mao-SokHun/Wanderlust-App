@@ -319,4 +319,15 @@ interface WanderlustApi {
         @Path("id") id: String,
         @Body request: BookTourRequest,
     ): BookTourResponse
+
+    @GET("api/vehicle/location")
+    suspend fun getVehicleLocation(
+        @Query("vehicleId") vehicleId: String? = null,
+    ): com.example.wanderlust.data.model.LiveVehicleStatus
+
+    @GET("api/coins/balance")
+    suspend fun getCoinsBalance(
+        @Header("Authorization") token: String? = null,
+    ): com.example.wanderlust.data.model.WanderCoinsAccount
 }
+

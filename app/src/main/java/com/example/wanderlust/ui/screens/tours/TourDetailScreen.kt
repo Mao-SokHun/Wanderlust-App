@@ -434,8 +434,7 @@ private fun TourDetailContent(
                 )
                 Spacer(Modifier.height(12.dp))
 
-                com.example.wanderlust.ui.components.SosEmergencySection()
-                Spacer(Modifier.height(12.dp))
+
 
                 com.example.wanderlust.ui.components.LiveVehicleTracker()
                 Spacer(Modifier.height(12.dp))

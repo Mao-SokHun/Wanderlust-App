@@ -100,6 +100,9 @@ fun HelpCenterScreen(
         title = stringApp(R.string.profile_help),
         onBack = onBack,
     ) {
+        com.example.wanderlust.ui.components.SosEmergencySection()
+        Spacer(Modifier.height(14.dp))
+
         StitchGhostCard(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
             Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
