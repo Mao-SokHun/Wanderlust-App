@@ -177,8 +177,8 @@ fun CategoryChipRow(
 }
 
 @Composable
-@Composable
 fun DestinationListCard(
+
     destination: DestinationCard,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,

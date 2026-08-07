@@ -25,6 +25,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,15 +46,17 @@ fun LiveVehicleTracker(
     status: LiveVehicleStatus = SampleVehicleStatus.sampleBus,
     modifier: Modifier = Modifier,
 ) {
-    var liveStatus by remember { androidx.compose.runtime.mutableStateOf(status) }
+    var liveStatus by remember { mutableStateOf(status) }
+
 
     androidx.compose.runtime.LaunchedEffect(Unit) {
         runCatching {
-            val api = com.example.wanderlust.data.remote.ApiConnection.create()
+            val api = com.example.wanderlust.data.remote.ApiConnection.api()
             val fetched = api.getVehicleLocation("bus-wl-998")
             liveStatus = fetched
         }
     }
+
 
     val currentStatus = liveStatus
 

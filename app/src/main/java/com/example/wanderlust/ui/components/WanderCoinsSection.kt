@@ -54,13 +54,14 @@ fun WanderCoinsSection(
     androidx.compose.runtime.LaunchedEffect(Unit) {
         if (com.example.wanderlust.data.SessionManager.isLoggedIn()) {
             runCatching {
-                val api = com.example.wanderlust.data.remote.ApiConnection.create()
+                val api = com.example.wanderlust.data.remote.ApiConnection.api()
                 val token = com.example.wanderlust.data.SessionManager.token.orEmpty()
                 val res = api.getSubscription("Bearer $token") // fallback
                 // fetch coins endpoint if available via custom call or default balance
             }
         }
     }
+
 
     StitchGhostCard(modifier = modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
