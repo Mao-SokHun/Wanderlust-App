@@ -308,7 +308,7 @@ class NearbyPlacesViewModel(application: Application) : AndroidViewModel(applica
                     isLoadingPlaces = false,
                     resultsVersion = uiState.resultsVersion + 1,
                     errorMessage = if (prepared.isEmpty()) {
-                        "No places found nearby. Try another category, larger radius, or keyword."
+                        "no_places_found"
                     } else {
                         null
                     },

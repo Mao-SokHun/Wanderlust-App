@@ -313,9 +313,18 @@ fun NearbyPlacesExplorer(
                     when {
                         state.isLoadingPlaces -> LoadingBlock(stringApp(R.string.nearby_loading_places))
                         state.errorMessage != null && state.places.isEmpty() -> {
-                            OfflineBannerCard(
-                                onRetry = { viewModel.loadPlaces() },
-                            )
+                            val err = state.errorMessage.orEmpty()
+                            if (err == "offline" || err.contains("connect", ignoreCase = true) || err.contains("host", ignoreCase = true)) {
+                                OfflineBannerCard(
+                                    onRetry = { viewModel.loadPlaces() },
+                                )
+                            } else {
+                                NoNearbyPlacesCard(
+                                    message = err,
+                                    onExpandRadius = { viewModel.onRadiusChange(5000) },
+                                    onRetry = { viewModel.loadPlaces() },
+                                )
+                            }
                         }
 
                         else -> {
@@ -496,6 +505,90 @@ fun OfflineBannerCard(
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun NoNearbyPlacesCard(
+    message: String,
+    onExpandRadius: () -> Unit,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val isKhmer = AppLocale.isKhmer
+    androidx.compose.material3.Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+        shadowElevation = 2.dp,
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Box(
+                Modifier
+                    .size(52.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFF6B35).copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Place,
+                    contentDescription = null,
+                    tint = Color(0xFFFF6B35),
+                    modifier = Modifier.size(28.dp),
+                )
+            }
+            Text(
+                text = if (isKhmer) "ពុំឃើញទីតាំងនៅជិតខាងនេះទេ" else "No Places Found Nearby",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = if (message == "no_places_found") {
+                    if (isKhmer) "ពុំទាន់ឃើញទីតាំងក្នុងចម្ងាយនេះទេ។ សូមព្យាយាមបង្កើនចម្ងាយស្វែងរក (Radius) ឬរើសប្រភេទផ្សេងទៀត។"
+                    else "No places found within this search radius. Try expanding the search radius or selecting another category."
+                } else {
+                    message
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Button(
+                    onClick = onExpandRadius,
+                    shape = RoundedCornerShape(99.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6B35)),
+                ) {
+                    Text(
+                        text = if (isKhmer) "បង្កើនចម្ងាយ (៥ គម)" else "Expand Radius (5 km)",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                    )
+                }
+                OutlinedButton(
+                    onClick = onRetry,
+                    shape = RoundedCornerShape(99.dp),
+                ) {
+                    Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = if (isKhmer) "សារជាថ្មី" else "Retry",
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
         }
     }
