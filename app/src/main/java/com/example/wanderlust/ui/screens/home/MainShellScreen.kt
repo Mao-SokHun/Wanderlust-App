@@ -49,6 +49,7 @@ fun MainShellScreen(
     onSignIn: () -> Unit,
     onRegister: () -> Unit,
     onAddSavedPlace: () -> Unit = {},
+    onOpenBusinessStudio: () -> Unit = {},
     favoritesViewModel: FavoritesViewModel = viewModel(),
 ) {
     var profileOverlay by remember { mutableStateOf<ProfileOverlay?>(null) }

@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -43,6 +45,7 @@ import com.example.wanderlust.ui.screens.auth.ForgotPasswordScreen
 import com.example.wanderlust.ui.screens.auth.LoginScreen
 import com.example.wanderlust.ui.screens.auth.RegisterScreen
 import com.example.wanderlust.ui.screens.auth.ResetPasswordScreen
+import com.example.wanderlust.ui.screens.info.NotificationCenterScreen
 import com.example.wanderlust.ui.screens.business.AddTourScreen
 import com.example.wanderlust.ui.screens.business.BusinessStudioScreen
 import com.example.wanderlust.ui.screens.business.BusinessSubscribeScreen
@@ -106,10 +109,25 @@ class MainActivity : ComponentActivity() {
             var lastExitPromptAtMs by remember { mutableLongStateOf(0L) }
             val context = LocalContext.current
 
+            val scope = androidx.compose.runtime.rememberCoroutineScope()
+
+            fun checkUpdateWithRetries() {
+                scope.launch {
+                    for (attempt in 1..3) {
+                        if (pendingUpdate != null) break
+                        val res = AppUpdateRepository().checkForUpdate().getOrNull()
+                        if (res != null) {
+                            pendingUpdate = res
+                            break
+                        }
+                        kotlinx.coroutines.delay(2_000L)
+                    }
+                }
+            }
+
             LaunchedEffect(Unit) {
                 isDarkTheme = SessionManager.userThemeDark
-                AppUpdateRepository().checkForUpdate()
-                    .onSuccess { update -> pendingUpdate = update }
+                checkUpdateWithRetries()
             }
 
             fun applySessionPreferences() {
@@ -182,6 +200,7 @@ class MainActivity : ComponentActivity() {
                                     onFinished = {
                                         mainTab = WanderlustNavTab.Home
                                         nav.resetTo(AppScreen.Main(WanderlustNavTab.Home))
+                                        checkUpdateWithRetries()
                                     },
                                 )
 
@@ -405,6 +424,10 @@ class MainActivity : ComponentActivity() {
                                         nav.pop()
                                         nav.push(AppScreen.TourDetail(dest))
                                     },
+                                )
+
+                                AppScreen.NotificationCenter -> NotificationCenterScreen(
+                                    onBack = { navigateBack() },
                                 )
                             }
                             pendingUpdate?.let { update ->

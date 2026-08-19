@@ -66,7 +66,10 @@ fun AppUpdateDialog(
                         scope.launch {
                             busy = true
                             status = downloadingLabel
-                            val err = ApkInstaller.downloadAndInstall(context, update.downloadUrl)
+                            val err = ApkInstaller.downloadAndInstall(
+                                context = context,
+                                url = update.downloadUrl,
+                            )
                             busy = false
                             if (err != null) {
                                 status = err
