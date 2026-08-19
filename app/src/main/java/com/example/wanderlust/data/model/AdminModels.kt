@@ -62,6 +62,7 @@ data class AdminPendingPayment(
     val status: String = "pending",
     val billNumber: String = "",
     val md5: String = "",
+    val sha256: String = "",
     val createdAt: String? = null,
     val reportedAt: String? = null,
 )

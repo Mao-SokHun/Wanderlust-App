@@ -34,8 +34,10 @@ import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.TravelExplore
+
 
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Home
@@ -223,8 +225,10 @@ fun ThemeToggleButton(
 @Composable
 fun WanderlustBrand(
     modifier: Modifier = Modifier,
+    onNotificationClick: (() -> Unit)? = null,
     onProfileClick: (() -> Unit)? = null,
     onSettingsClick: (() -> Unit)? = null,
+    hasUnreadNotifications: Boolean = true,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -243,6 +247,24 @@ fun WanderlustBrand(
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { onNotificationClick?.invoke() }) {
+                Box {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = "Notifications",
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f),
+                    )
+                    if (hasUnreadNotifications) {
+                        Box(
+                            Modifier
+                                .size(9.dp)
+                                .align(Alignment.TopEnd)
+                                .clip(CircleShape)
+                                .background(Color(0xFFFF6B35)),
+                        )
+                    }
+                }
+            }
             IconButton(onClick = { onProfileClick?.invoke() }) {
                 Icon(
                     imageVector = Icons.Default.AccountCircle,
@@ -260,6 +282,7 @@ fun WanderlustBrand(
         }
     }
 }
+
 
 
 @Composable

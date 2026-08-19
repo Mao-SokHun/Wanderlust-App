@@ -115,6 +115,8 @@ data class SandboxPayment(
     val paidAt: String? = null,
     val billNumber: String? = null,
     val md5: String? = null,
+    val sha256: String? = null,
+    val sha512: String? = null,
     val expiresAt: String? = null,
     val createdAt: String? = null,
 )
@@ -138,6 +140,8 @@ data class BakongCreatePaymentResponse(
 data class BakongKhqrPayload(
     val qr: String = "",
     val md5: String = "",
+    val sha256: String = "",
+    val sha512: String = "",
     val amountUsd: Double = 0.0,
     val amountKhr: Int = 0,
     val amount: Double = 0.0,

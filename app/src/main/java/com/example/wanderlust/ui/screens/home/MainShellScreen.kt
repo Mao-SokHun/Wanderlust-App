@@ -44,7 +44,7 @@ fun MainShellScreen(
     onOpenPrivacy: () -> Unit,
     onOpenTerms: () -> Unit,
     onOpenAbout: () -> Unit,
-    onOpenBusinessStudio: () -> Unit = {},
+    onOpenNotifications: () -> Unit = {},
     onLogout: () -> Unit,
     onSignIn: () -> Unit,
     onRegister: () -> Unit,
@@ -84,7 +84,11 @@ fun MainShellScreen(
                 onSignIn = onSignIn,
                 onRegister = onRegister,
                 onPlaceSaved = { favoritesViewModel.refresh() },
+                onNotificationClick = onOpenNotifications,
+                onProfileClick = { onTabChange(WanderlustNavTab.Profile) },
+                onSettingsClick = onOpenSettings,
             )
+
             WanderlustNavTab.Tours -> ToursMarketplaceScreen(
                 onTourClick = onDestinationClick,
                 onOpenBusinessStudio = onOpenBusinessStudio,

@@ -97,8 +97,9 @@ fun AdminPendingPaymentsScreen(onBack: () -> Unit) {
                     Spacer(Modifier.height(6.dp))
                     Text("Plan: ${pay.planId} · $${String.format("%.2f", pay.amountUsd)}")
                     Text("Bill: ${pay.billNumber}", style = MaterialTheme.typography.bodySmall)
-                    if (pay.md5.isNotBlank()) {
-                        Text("MD5: ${pay.md5.take(16)}…", style = MaterialTheme.typography.labelSmall)
+                    val hashDisplay = pay.sha256.ifBlank { pay.md5 }
+                    if (hashDisplay.isNotBlank()) {
+                        Text("SHA-256: ${hashDisplay.take(16)}…", style = MaterialTheme.typography.labelSmall)
                     }
                     Spacer(Modifier.height(10.dp))
                     Row(

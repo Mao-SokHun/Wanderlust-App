@@ -36,4 +36,6 @@ sealed class AppScreen {
     data object About : AppScreen()
     data object ExportData : AppScreen()
     data object AddSavedPlace : AppScreen()
+    data object NotificationCenter : AppScreen()
 }
+

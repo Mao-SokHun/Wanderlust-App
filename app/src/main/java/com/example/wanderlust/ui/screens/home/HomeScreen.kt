@@ -49,6 +49,9 @@ fun HomeScreen(
     onSignIn: () -> Unit = {},
     onRegister: () -> Unit = onSignIn,
     onPlaceSaved: () -> Unit = {},
+    onNotificationClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
 ) {
     val nearbyVm: NearbyPlacesViewModel = viewModel()
     val focusManager = LocalFocusManager.current
@@ -61,7 +64,12 @@ fun HomeScreen(
             .padding(horizontal = 16.dp),
     ) {
         Spacer(Modifier.height(8.dp))
-        WanderlustBrand()
+        WanderlustBrand(
+            onNotificationClick = onNotificationClick,
+            onProfileClick = onProfileClick,
+            onSettingsClick = onSettingsClick,
+        )
+
         Spacer(Modifier.height(14.dp))
         CompactSearchField(
             value = query,
